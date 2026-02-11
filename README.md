@@ -1,6 +1,10 @@
-## ESPHome Zehnder Comfoair E300/E400
+## ESPHome Zehnder ComfoAir E300/E400
 
-ESPHome component for reading the Zehnder ComfoAir E300/E400 heat recovering ventilation units.
+ESPHome component for communication with the Zehnder ComfoAir E300/E400 heat recovering ventilation units.
+
+
+### Setup 
+The unit uses RS485 serial communication at 19200:8:EVEN:1. Connetion using a twisted pair wired to the C3 port on the Zehnder unit.
 
 ### Example of minimal configuration yaml
 ```yaml
@@ -31,7 +35,7 @@ modbus:
 
 modbus_controller:
 - id: modbus_device
-  address: 0x1   ## address of the Modbus slave device on the bus
+  address: 0x1
   modbus_id: modbus1
   setup_priority: -10
   update_interval: 5s
