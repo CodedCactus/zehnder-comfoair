@@ -47,17 +47,19 @@ modbus_controller:
 
 holding registers
 
-| Adress | Name                                | Datatype | Unit | Note                     |
-|--------|-------------------------------------|----------|------|--------------------------|
-| 0x136  | Exhaust fan duty cycle              | U_WORD   | %    | % x 10                   |
-| 0x137  | Supply fan duty cycle               | U_WORD   | %    | % x 10                   |
-| 0x138  | Exhaust fan air flow                | U_WORD   | m³/h |                          |
-| 0x139  | Supply fan air flow                 | U_WORD   | m³/h |                          |
-| 0x13A  | Exhaust fan speed                   | U_WORD   | RPM  |                          |
-| 0x13B  | Supply fan speed                    | U_WORD   | RPM  |                          |
-| 0x14A  | External ventilation level setpoint | U_WORD   | -    | 0:low;50:medium;100:high |
-| 0x12C  | Outdoor air temperature             | U_WORD   | °C   | °C x 10                  |
-| 0x12D  | Pre-heater temperature              | U_WORD   | °C   | °C x 10                  |
-| 0x12F  | Supply air temperature              | U_WORD   | °C   | °C x 10                  |
-| 0x130  | Extract air temperature             | U_WORD   | °C   | °C x 10                  |
-| 0x131  | Exhaust air temperature             | U_WORD   | °C   | °C x 10                  |
+| Adress | Name                                | Datatype | Unit  | Note                     |
+|--------|-------------------------------------|----------|-------|--------------------------|
+| 0x136  | Exhaust fan duty cycle              | U_WORD   | %*10  |                          |
+| 0x137  | Supply fan duty cycle               | U_WORD   | %*10  |                          |
+| 0x138  | Exhaust fan air flow                | U_WORD   | m³/h  |                          |
+| 0x139  | Supply fan air flow                 | U_WORD   | m³/h  |                          |
+| 0x13A  | Exhaust fan speed                   | U_WORD   | RPM   |                          |
+| 0x13B  | Supply fan speed                    | U_WORD   | RPM   |                          |
+| 0x12C  | Outdoor air temperature             | U_WORD   | °C*10 |                          |
+| 0x12D  | Pre-heater temperature              | U_WORD   | °C*10 |                          |
+| 0x12F  | Supply air temperature              | U_WORD   | °C*10 |                          |
+| 0x130  | Extract air temperature             | U_WORD   | °C*10 |                          |
+| 0x131  | Exhaust air temperature             | U_WORD   | °C*10 |                          |
+| 0x14A  | Perilex ventilation setpoint        | U_WORD   | -     | 0:low;50:medium;100:high |
+| 0x149  | RF ventilation setpoint             | U_WORD   | -     | 0:low;50:medium;100:high |
+| 0x13D  | RF input voltage                    | U_WORD   | V*10  | steering signal (0-10)   |
