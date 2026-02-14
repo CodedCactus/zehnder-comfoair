@@ -66,7 +66,7 @@ sensor:
   address: 0x12C
   unit_of_measurement: "°C"
   device_class: "temperature"
-  value_type: U_WORD
+  value_type: S_WORD
   id: zehnder_t1
   accuracy_decimals: 1
   filters:
@@ -78,7 +78,7 @@ sensor:
   address: 0x12D
   unit_of_measurement: "°C"
   device_class: "temperature"
-  value_type: U_WORD
+  value_type: S_WORD
   id: zehnder_t2
   accuracy_decimals: 1
   filters:
@@ -90,7 +90,7 @@ sensor:
   address: 0x12F
   unit_of_measurement: "°C"
   device_class: "temperature"
-  value_type: U_WORD
+  value_type: S_WORD
   id: zehnder_t4
   accuracy_decimals: 1
   filters:
@@ -102,7 +102,7 @@ sensor:
   address: 0x130
   unit_of_measurement: "°C"
   device_class: "temperature"
-  value_type: U_WORD
+  value_type: S_WORD
   id: zehnder_t5
   accuracy_decimals: 1
   filters:
@@ -114,7 +114,7 @@ sensor:
   address: 0x131
   unit_of_measurement: "°C"
   device_class: "temperature"
-  value_type: U_WORD
+  value_type: S_WORD
   id: zehnder_t6
   accuracy_decimals: 1
   filters:
