@@ -20,6 +20,7 @@ modbus_controller:
   update_interval: ${update_interval}
 
 sensor:
+# --- fan states ---
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Exhaust fan duty cycle"
@@ -79,6 +80,7 @@ sensor:
   value_type: U_WORD
   id: zehnder_supply_rpm
 
+# --- temperatures ---
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Outdoor air temperature"
@@ -140,10 +142,40 @@ sensor:
   filters:
     - multiply: 0.1
 
+# --- control setpoint ---
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Ventilation level"
+  name: "3-way switch control setpoint"
+  id: 3way_control_setpoint
   register_type: holding
   address: 0x14A
   unit_of_measurement: "%"
   value_type: U_WORD
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "0-10 V control setpoint"
+  id: 0_10V_control_setpoint
+  register_type: holding
+  address: 0x148
+  unit_of_measurement: "%"
+  value_type: U_WORD
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RF control setpoint"
+  id: rf_control_setpoint
+  register_type: holding
+  address: 0x149
+  unit_of_measurement: "%"
+  value_type: U_WORD
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RF input voltage"
+  id: rf_input_voltage
+  register_type: holding
+  address: 0x13D
+  unit_of_measurement: "V"
+  value_type: U_WORD
+  accuracy_decimals: 1
+  filters:
+    - multiply: 0.01

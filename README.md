@@ -44,7 +44,7 @@ holding registers
 | 0x12F  | Supply air temperature              | S_WORD   | °C*10 |                          |
 | 0x130  | Extract air temperature             | S_WORD   | °C*10 |                          |
 | 0x131  | Exhaust air temperature             | S_WORD   | °C*10 |                          |
-| 0x14A  | 3-way switch ventilation setpoint   | U_WORD   | -     | 0:low;50:medium;100:high |
-| 0x148  | 0-10 V ventilation setpoint         | U_WORD   | -     | 0:low;50:medium;100:high |
-| 0x149  | RF ventilation setpoint             | U_WORD   | -     | 0:low;50:medium;100:high |
+| 0x14A  | 3-way switch control setpoint       | U_WORD   | -     | 0:low;50:medium;100:high |
+| 0x148  | 0-10 V control setpoint             | U_WORD   | -     | 0:low;50:medium;100:high |
+| 0x149  | RF control setpoint                 | U_WORD   | -     | 0:low;50:medium;100:high |
 | 0x13D  | RF input voltage                    | U_WORD   | V*100 | steering signal (0-10)   |
