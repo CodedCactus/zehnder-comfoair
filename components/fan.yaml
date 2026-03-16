@@ -57,7 +57,7 @@ script:
             if (sc <= 1) return 1;
             // If level is essentially zero treat as first step
             if (level <= 0.0) return 1;
-            // Map level [0,1] to indices [1, sc], rounding to nearest index
+            // Map level [0,1] to indices [1, sc], floor to nearest index
             int idx = 1 + (int)floor(level * (sc - 1));
             if (idx < 1) idx = 1;
             if (idx > sc) idx = sc;
