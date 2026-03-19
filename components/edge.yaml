@@ -1,0 +1,114 @@
+# --- additional sensors provided by the edge device ---
+
+# --- dew point ---
+- platform: dew_point
+  name: "Outdoor dew point"
+  id: outdoor_dew_point
+  temperature: zehnder_outdoor_temp
+  humidity: zehnder_outdoor_humidity
+
+- platform: dew_point
+  name: "Supply dew point"
+  id: supply_dew_point
+  temperature: zehnder_supply_temp
+  humidity: zehnder_supply_humidity
+
+- platform: dew_point
+  name: "Extract dew point"
+  id: extract_dew_point
+  temperature: zehnder_extract_temp
+  humidity: zehnder_extract_humidity
+
+- platform: dew_point
+  name: "Exhaust dew point"
+  id: exhaust_dew_point
+  temperature: zehnder_exhaust_temp
+  humidity: zehnder_exhaust_humidity
+
+# --- absolute humidity ---
+- platform: absolute_humidity
+  name: "Outdoor absolute Humidity"
+  id: outdoor_absolute_humidity
+  temperature: zehnder_outdoor_temp
+  humidity: zehnder_outdoor_humidity
+
+- platform: absolute_humidity
+  name: "Supply absolute Humidity"
+  id: supply_absolute_humidity
+  temperature: zehnder_supply_temp
+  humidity: zehnder_supply_humidity
+
+- platform: absolute_humidity
+  name: "Extract absolute Humidity"
+  id: extract_absolute_humidity
+  temperature: zehnder_extract_temp
+  humidity: zehnder_extract_humidity
+
+- platform: absolute_humidity
+  name: "Exhaust absolute Humidity"
+  id: exhaust_absolute_humidity
+  temperature: zehnder_exhaust_temp
+  humidity: zehnder_exhaust_humidity
+
+# --- efficiency
+- platform: template
+  name: "WTW Temperature Transfer"
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-chevron-up"
+  state_class: measurement
+  lambda: |-
+    return id(zehnder_supply_temp).state - id(zehnder_extract_temp).state;
+
+- platform: template
+  name: "WTW Moisture Transfer"
+  unit_of_measurement: "g/m³"
+  icon: "mdi:water-plus"
+  state_class: measurement
+  lambda: |-
+    return id(supply_absolute_humidity).state - id(extract_absolute_humidity).state;
+
+# --- comfort level
+- platform: template
+  name: "Extract Air Comfort Level"
+  icon: "mdi:hand-extended"
+  update_interval: 60s
+  lambda: |-
+    // 0. Grab the temperature and dew point 
+    float t = id(zehnder_extract_temp).state;
+    float dp = id(extract_dew_point).state; 
+    if (isnan(t) || isnan(dp)) return {"Unknown"};
+    // 1. Catch Temperature Extremes First
+    if (t < 18.0) return {"Cold"};
+    if (t > 26.0) return {"Hot"};
+    // 2. Now we judge based on the Dew Point
+    if (dp < 6.0) return {"Dry"}; // Can cause dry skin/eyes or static shocks
+    if (dp > 18.0) return {"Damp"}; // Air feels heavy and warm
+    if (dp >= 16.0 && dp <= 18.0) return {"Humid"}; 
+    // 3. The "Goldilocks" Zone
+    // Temperature is good (20-24) and moisture is very comfortable (Dew point 8-14)
+    if (t >= 20.0 && t <= 24.0 && dp >= 8.0 && dp <= 14.0) return {"Excellent"};
+    // 4. Catch-all for acceptable ranges that don't hit the extremes
+    return {"Good"};
+    
+- platform: template
+  name: "Supply Air Comfort Level"
+  icon: "mdi:hand-extended"
+  update_interval: 60s
+  lambda: |-
+    // 0. Grab the temperature and dew point 
+    float t = id(zehnder_supply_temp).state;
+    float dp = id(supply_dew_point).state; 
+    if (isnan(t) || isnan(dp)) return {"Unknown"};
+    // 1. Catch Temperature Extremes First
+    if (t < 18.0) return {"Cold"};
+    if (t > 26.0) return {"Hot"};
+    // 2. Now we judge based on the Dew Point
+    if (dp < 6.0) return {"Dry"}; // Can cause dry skin/eyes or static shocks
+    if (dp > 18.0) return {"Damp"}; // Air feels heavy and warm
+    if (dp >= 16.0 && dp <= 18.0) return {"Humid"}; 
+    // 3. The "Goldilocks" Zone
+    // Temperature is good (20-24) and moisture is very comfortable (Dew point 8-14)
+    if (t >= 20.0 && t <= 24.0 && dp >= 8.0 && dp <= 14.0) return {"Excellent"};
+    // 4. Catch-all for acceptable ranges that don't hit the extremes
+    return {"Good"};
+
