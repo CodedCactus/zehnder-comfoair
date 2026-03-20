@@ -1,71 +1,237 @@
-# --- additional sensors provided by the edge device ---
+# --- additional sensors calculated on the edge device ---
 
 # --- dew point ---
 - platform: dew_point
   name: "Outdoor dew point"
   id: outdoor_dew_point
+  icon: mdi:thermometer-water
   temperature: zehnder_outdoor_temp
   humidity: zehnder_outdoor_humidity
 
 - platform: dew_point
   name: "Supply dew point"
   id: supply_dew_point
+  icon: mdi:thermometer-water
   temperature: zehnder_supply_temp
   humidity: zehnder_supply_humidity
 
 - platform: dew_point
   name: "Extract dew point"
   id: extract_dew_point
+  icon: mdi:thermometer-water
   temperature: zehnder_extract_temp
   humidity: zehnder_extract_humidity
 
 - platform: dew_point
   name: "Exhaust dew point"
   id: exhaust_dew_point
+  icon: mdi:thermometer-water
   temperature: zehnder_exhaust_temp
   humidity: zehnder_exhaust_humidity
 
 # --- absolute humidity ---
 - platform: absolute_humidity
-  name: "Outdoor absolute Humidity"
+  name: "Outdoor absolute humidity"
   id: outdoor_absolute_humidity
   temperature: zehnder_outdoor_temp
   humidity: zehnder_outdoor_humidity
 
 - platform: absolute_humidity
-  name: "Supply absolute Humidity"
+  name: "Supply absolute humidity"
   id: supply_absolute_humidity
   temperature: zehnder_supply_temp
   humidity: zehnder_supply_humidity
 
 - platform: absolute_humidity
-  name: "Extract absolute Humidity"
+  name: "Extract absolute humidity"
   id: extract_absolute_humidity
   temperature: zehnder_extract_temp
   humidity: zehnder_extract_humidity
 
 - platform: absolute_humidity
-  name: "Exhaust absolute Humidity"
+  name: "Exhaust absolute humidity"
   id: exhaust_absolute_humidity
   temperature: zehnder_exhaust_temp
   humidity: zehnder_exhaust_humidity
 
-# --- efficiency
+# --- enthalpy ---
 - platform: template
-  name: "WTW Temperature Transfer"
+  name: "Exhaust Enthalpy"
+  id: exhaust_enthalpy
+  icon: mdi:heat-wave
+  unit_of_measurement: "kJ/h"
+  state_class: measurement
+  lambda: |-
+    float t = id(zehnder_exhaust_temp).state;
+    float ah = id(exhaust_absolute_humidity).state;
+    float flow = id(zehnder_exhaust_flow).state; 
+    
+    if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
+    
+    float rho = 353.0 / (t + 273.15);   // Density of dry air at sea level (approx 101325 Pa)
+    float h_dry = 1.006 * t;            // Sensible heat of the dry air
+    float h_vap = 2501.0 + (1.86 * t);  // Latent + sensible heat of the water vapor
+    
+    return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;     // Total Enthalpy 
+
+- platform: template
+  name: "Extract Enthalpy"
+  id: extract_enthalpy
+  icon: mdi:heat-wave
+  unit_of_measurement: "kJ/h"
+  state_class: measurement
+  lambda: |-
+    float t = id(zehnder_extract_temp).state;
+    float ah = id(extract_absolute_humidity).state;
+    float flow = id(zehnder_exhaust_flow).state; 
+    
+    if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
+    
+    float rho = 353.0 / (t + 273.15);   // Density of dry air at sea level (approx 101325 Pa)
+    float h_dry = 1.006 * t;            // Sensible heat of the dry air
+    float h_vap = 2501.0 + (1.86 * t);  // Latent + sensible heat of the water vapor
+    
+    return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;     // Total Enthalpy 
+    
+- platform: template
+  name: "Supply Enthalpy"
+  id: supply_enthalpy
+  icon: mdi:heat-wave
+  unit_of_measurement: "kJ/h"
+  state_class: measurement
+  lambda: |-
+    float t = id(zehnder_supply_temp).state;
+    float ah = id(supply_absolute_humidity).state;
+    float flow = id(zehnder_supply_flow).state; 
+    
+    if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
+    
+    float rho = 353.0 / (t + 273.15);   // Density of dry air at sea level (approx 101325 Pa)
+    float h_dry = 1.006 * t;            // Sensible heat of the dry air
+    float h_vap = 2501.0 + (1.86 * t);  // Latent + sensible heat of the water vapor
+    
+    return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;    // Total Enthalpy 
+
+- platform: template
+  name: "Outdoor Enthalpy"
+  id: outdoor_enthalpy
+  icon: mdi:heat-wave
+  unit_of_measurement: "kJ/h"
+  state_class: measurement
+  lambda: |-
+    float t = id(zehnder_outdoor_temp).state;
+    float ah = id(outdoor_absolute_humidity).state;
+    float flow = id(zehnder_supply_flow).state;     // Next best sensor to use here.
+
+    if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
+
+    float rho = 353.0 / (t + 273.15); 
+    float h_dry = 1.006 * t; 
+    float h_vap = 2501.0 + (1.86 * t); 
+
+    return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;
+
+# --- deltas ---
+- platform: template
+  name: "Delta temperature"
   unit_of_measurement: "°C"
-  icon: "mdi:thermometer-chevron-up"
+  icon: mdi:thermometer-chevron-up
   state_class: measurement
   lambda: |-
     return id(zehnder_supply_temp).state - id(zehnder_extract_temp).state;
 
 - platform: template
-  name: "WTW Moisture Transfer"
+  name: "Delta moisture"
   unit_of_measurement: "g/m³"
-  icon: "mdi:water-plus"
+  icon: mdi:water-plus
   state_class: measurement
   lambda: |-
-    return id(supply_absolute_humidity).state - id(extract_absolute_humidity).state;
+    return id(outdoor_absolute_humidity).state - id(exhaust_absolute_humidity).state;
+
+- platform: template
+  name: "Delta energy"
+  id: wtw_net_energy_loss
+  unit_of_measurement: "kJ/h"
+  icon: mdi:heat-wave
+  state_class: measurement
+  entity_category: diagnostic
+  lambda: |-
+    return id(extract_enthalpy).state - id(supply_enthalpy).state;
+
+# --- efficiency ---
+- platform: template
+  name: "Efficiency of moisture retention"
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+  state_class: measurement
+  update_interval: 60s
+  lambda: |-
+    // 1. Grab the Absolute Humidity states (in g/m³)
+    float ah_out = id(outdoor_absolute_humidity).state;
+    float ah_ext = id(extract_absolute_humidity).state; // Moisture inside
+    float ah_sup = id(supply_absolute_humidity).state;  // Moisture returned
+
+    if (isnan(ah_out) || isnan(ah_ext) || isnan(ah_sup)) return NAN;
+
+    // 2. The maximum potential moisture transfer
+    float potential = ah_ext - ah_out;
+
+    // 3. Prevent division by zero if indoor and outdoor humidity are exactly the same
+    if (fabs(potential) < 0.1) return 0.0;
+
+    // 4. Calculate how much moisture was actually recovered
+    return ((ah_sup - ah_out) / potential) * 100.0;
+    
+- platform: template
+  name: "WTW Enthalpy Efficiency"
+  id: wtw_enthalpy_efficiency
+  unit_of_measurement: "%"
+  icon: "mdi:chart-bell-curve-cumulative"
+  state_class: measurement
+  lambda: |-
+    // 1. Macro calculates total energy flow based on Temp, Abs Humidity, and Volume Flow in (kJ/h)
+    auto calc_H_flow = [](float T, float AH, float flow) -> float {
+      float rho = 353.0 / (T + 273.15); 
+      float h_dry = 1.006 * T; 
+      float h_vap = 2501.0 + (1.86 * T); 
+      return ((h_dry * rho) + ((AH / 1000.0) * h_vap)) * flow;
+    };
+
+    // 2. Collect states from your existing sensors
+    float t_out = id(zehnder_outdoor_temp).state;
+    float ah_out = id(outdoor_absolute_humidity).state;
+    
+    float t_ext = id(zehnder_extract_temp).state;
+    float ah_ext = id(extract_absolute_humidity).state;
+    float f_ext = id(zehnder_exhaust_flow).state; // Flow leaving the house
+    
+    float t_sup = id(zehnder_supply_temp).state;
+    float ah_sup = id(supply_absolute_humidity).state;
+    float f_sup = id(zehnder_supply_flow).state; // Flow entering the house
+
+    if (isnan(t_out) || isnan(ah_out) || isnan(t_ext) || isnan(ah_ext) || 
+        isnan(f_ext) || isnan(t_sup) || isnan(ah_sup) || isnan(f_sup)) {
+      return NAN;
+    }
+
+    // 3. Calculate the gain vs potential
+    // Gain: Energy the supply air actually added compared to outdoor conditions
+    float H_sup = calc_H_flow(t_sup, ah_sup, f_sup);
+    float H_out_at_sup_flow = calc_H_flow(t_out, ah_out, f_sup);
+    float energy_gain = H_sup - H_out_at_sup_flow;
+    
+    // Potential: Total energy available in the extract air compared to outdoor conditions
+    float H_ext = calc_H_flow(t_ext, ah_ext, f_ext);
+    float H_out_at_ext_flow = calc_H_flow(t_out, ah_out, f_ext);
+    float energy_potential = H_ext - H_out_at_ext_flow;
+
+    // 4. Prevent division by zero
+    if (fabs(energy_potential) < 1.0) return 0.0;
+    
+    // 5. Calculate Efficiency (%)
+    // If the system is unbalanced (e.g. f_ext > f_sup), energy_gain will be lower 
+    // than energy_potential even if the heat exchanger is 100% efficient.
+    return (energy_gain / energy_potential) * 100.0;
 
 # --- comfort level
 - platform: template
