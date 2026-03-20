@@ -240,7 +240,7 @@
 
 # --- comfort level
 - platform: template
-  name: "Extract Air Comfort Level"
+  name: "Extract air comfort level"
   icon: "mdi:hand-extended"
   update_interval: 60s
   lambda: |-
@@ -262,7 +262,7 @@
     return {"Good"};
     
 - platform: template
-  name: "Supply Air Comfort Level"
+  name: "Supply air comfort level"
   icon: "mdi:hand-extended"
   update_interval: 60s
   lambda: |-
