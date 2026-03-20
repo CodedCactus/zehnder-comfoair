@@ -1,4 +1,4 @@
-# --- additional sensors calculated on the edge device ---
+# --- extra sensors calculated on the edge device ---
 
 # --- dew point ---
 - platform: dew_point
