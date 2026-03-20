@@ -97,7 +97,8 @@ packages:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: main
     files: [components/zehnder.yaml,
-            components/fan.yaml] # comment out the fan.yaml if you don't want fan control
+            components/fan.yaml,        # comment out fan.yaml if you don't want fan control
+            components/edge.yaml]       # comment out edge.yaml if you don't want extra entities
     refresh: 0s
 
 output:
@@ -128,7 +129,7 @@ Notes:
 The following data fields have been identified from the holding registers. Currently, all registers are read-only.
 
 | Address | Name                             | Datatype | Unit | Scale | Note |
-|-------- |----------------------------------|----------|------|-------|--|
+|-------- |----------------------------------|----------|------|-------|------|
 | 0x065   | Device Status                    | U_WORD   | -    | -     | 0: Error; 1:Initializing; 2: Self Test; 3: Waiting for user input; 10: Normal; 20: Standby; 42: Maintenance Mode |
 | 0x06E   | Firmware version                 | U_WORD   | -    | -     | 20800 = 2.8.0 |
 | 0x06F   | Orientation                      | U_WORD   | -    | -     | 0:Right; 1:Left |
@@ -165,3 +166,28 @@ The following data fields have been identified from the holding registers. Curre
 | 0x151   | Fireplace mode*                  | U_WORD   | -    | -     | 0:Off; 1:On |
 
 *Only available on later firmware versions (confirmed on 2.8.0)
+
+### Additional sensors
+
+extra-sensors.yaml provides additional entities which might be useful. They are calculated on the ESPHome device.
+Have a look at the [Thermal Comfort integration](https://github.com/dolezsa/thermal_comfort) if you prefer to have some of these values calculated in home assistant. 
+
+| Name                             | Unit | Note |
+|----------------------------------|------|------|
+| Outdoor dew point                | °C   | The temperature to which air must be cooled to form dew (100% humidity) |
+| Supply dew point                 | °C   | Dew point is closely related to the perceived dryness of air |
+| Extract dew point                | °C   |      |
+| Exhaust dew point                | °C   | T    |
+| Outdoor absolute humidity        | g/m³ | The amount of water vapor (g) present in 1m³ the air |
+| Supply absolute humidity         | g/m³ |      |
+| Extract absolute humidity        | g/m³ |      |
+| Exhaust absolute humidity        | g/m³ |      |
+| Outdoor enthalpy                 | kJ/h | The amount of energy (kJ) transported by the air every hour |
+| Supply enthalpy                  | kJ/h | Enthalpy is for air what energy is for electricity |
+| Extract enthalpy                 | kJ/h |      |
+| Exhaust enthalpy                 | kJ/h |      |
+| Delta temperature                | °C   | The differnce between supply temperature and extract temperature |
+| Delta moisture                   | g/m³ | The differnce between outdoor humidity and exhaust humidity |
+| Delta energy                     | kJ/h | The differnce between supply enthalpy and exhaust enthalpy |
+| Efficiency of moisture retention | %    | The relative efficiency of moisture retention |
+| Efficiency of energy retention   | %    | The relative efficiency of energy retention |
