@@ -97,8 +97,8 @@ packages:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: main
     files: [components/zehnder.yaml,
-            components/fan.yaml,        # comment out fan.yaml if you don't want fan control
-            components/edge.yaml]       # comment out edge.yaml if you don't want extra entities
+            components/fan.yaml,           # comment out fan.yaml if you don't want fan control
+            components/extra-sensors.yaml] # comment out edge.yaml if you don't want extra entities
     refresh: 0s
 
 output:
