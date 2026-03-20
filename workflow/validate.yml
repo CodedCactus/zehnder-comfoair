@@ -21,7 +21,7 @@ jobs:
           EOF
 
       # Step 2: Validate all YAML files in the repo
-      - name: Run ESPHome Valaidate
+      - name: Run ESPHome Validate
         uses: esphome/build-action@v6
         with:
           version: latest
