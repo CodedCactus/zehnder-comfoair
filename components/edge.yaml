@@ -3,28 +3,28 @@
 # --- dew point ---
 - platform: dew_point
   name: "Outdoor dew point"
-  id: outdoor_dew_point
+  id: zehnder_outdoor_dew_point
   icon: mdi:thermometer-water
   temperature: zehnder_outdoor_temp
   humidity: zehnder_outdoor_humidity
 
 - platform: dew_point
   name: "Supply dew point"
-  id: supply_dew_point
+  id: zehnder_supply_dew_point
   icon: mdi:thermometer-water
   temperature: zehnder_supply_temp
   humidity: zehnder_supply_humidity
 
 - platform: dew_point
   name: "Extract dew point"
-  id: extract_dew_point
+  id: zehnder_extract_dew_point
   icon: mdi:thermometer-water
   temperature: zehnder_extract_temp
   humidity: zehnder_extract_humidity
 
 - platform: dew_point
   name: "Exhaust dew point"
-  id: exhaust_dew_point
+  id: zehnder_exhaust_dew_point
   icon: mdi:thermometer-water
   temperature: zehnder_exhaust_temp
   humidity: zehnder_exhaust_humidity
@@ -32,39 +32,39 @@
 # --- absolute humidity ---
 - platform: absolute_humidity
   name: "Outdoor absolute humidity"
-  id: outdoor_absolute_humidity
+  id: zehnder_outdoor_absolute_humidity
   temperature: zehnder_outdoor_temp
   humidity: zehnder_outdoor_humidity
 
 - platform: absolute_humidity
   name: "Supply absolute humidity"
-  id: supply_absolute_humidity
+  id: zehnder_supply_absolute_humidity
   temperature: zehnder_supply_temp
   humidity: zehnder_supply_humidity
 
 - platform: absolute_humidity
   name: "Extract absolute humidity"
-  id: extract_absolute_humidity
+  id: zehnder_extract_absolute_humidity
   temperature: zehnder_extract_temp
   humidity: zehnder_extract_humidity
 
 - platform: absolute_humidity
   name: "Exhaust absolute humidity"
-  id: exhaust_absolute_humidity
+  id: zehnder_exhaust_absolute_humidity
   temperature: zehnder_exhaust_temp
   humidity: zehnder_exhaust_humidity
 
 # --- enthalpy ---
 - platform: template
   name: "Exhaust enthalpy"
-  id: exhaust_enthalpy
+  id: zehnder_exhaust_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
   accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_exhaust_temp).state;
-    float ah = id(exhaust_absolute_humidity).state;
+    float ah = id(zehnder_exhaust_absolute_humidity).state;
     float flow = id(zehnder_exhaust_flow).state; 
     
     if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
@@ -77,14 +77,14 @@
 
 - platform: template
   name: "Extract enthalpy"
-  id: extract_enthalpy
+  id: zehnder_extract_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
   accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_extract_temp).state;
-    float ah = id(extract_absolute_humidity).state;
+    float ah = id(zehnder_extract_absolute_humidity).state;
     float flow = id(zehnder_exhaust_flow).state; 
     
     if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
@@ -97,14 +97,14 @@
     
 - platform: template
   name: "Supply enthalpy"
-  id: supply_enthalpy
+  id: zehnder_supply_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
   accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_supply_temp).state;
-    float ah = id(supply_absolute_humidity).state;
+    float ah = id(zehnder_supply_absolute_humidity).state;
     float flow = id(zehnder_supply_flow).state; 
     
     if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
@@ -117,14 +117,14 @@
 
 - platform: template
   name: "Outdoor enthalpy"
-  id: outdoor_enthalpy
+  id: zehnder_outdoor_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
   accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_outdoor_temp).state;
-    float ah = id(outdoor_absolute_humidity).state;
+    float ah = id(zehnder_outdoor_absolute_humidity).state;
     float flow = id(zehnder_supply_flow).state;     // Next best sensor to use here.
 
     if (isnan(t) || isnan(ah) || isnan(flow)) return NAN;
@@ -138,6 +138,7 @@
 # --- deltas ---
 - platform: template
   name: "Delta temperature"
+  id: zehnder_delta_temp
   unit_of_measurement: "°C"
   icon: mdi:thermometer-chevron-up
   state_class: measurement
@@ -146,35 +147,37 @@
 
 - platform: template
   name: "Delta moisture"
+  id: zehnder_delta_absolute_humidity
   unit_of_measurement: "g/m³"
   icon: mdi:water-plus
   state_class: measurement
   accuracy_decimals: 2
   lambda: |-
-    return id(outdoor_absolute_humidity).state - id(exhaust_absolute_humidity).state;
+    return id(zehnder_outdoor_absolute_humidity).state - id(zehnder_exhaust_absolute_humidity).state;
 
 - platform: template
   name: "Delta energy"
-  id: wtw_net_energy_loss
+  id: zehnder_delta_enthalpy
   unit_of_measurement: "kJ/h"
   icon: mdi:heat-wave
   state_class: measurement
   accuracy_decimals: 0
   lambda: |-
-    return id(extract_enthalpy).state - id(supply_enthalpy).state;
+    return id(zehnder_extract_enthalpy).state - id(zehnder_supply_enthalpy).state;
 
 # --- efficiency ---
 - platform: template
   name: "Efficiency of moisture retention"
+  id: zehnder_efficiency_absolute_humidity
   unit_of_measurement: "%"
   icon: "mdi:water-percent"
   state_class: measurement
   update_interval: 60s
   lambda: |-
     // 1. Grab the Absolute Humidity states (in g/m³)
-    float ah_out = id(outdoor_absolute_humidity).state;
-    float ah_ext = id(extract_absolute_humidity).state; // Moisture inside
-    float ah_sup = id(supply_absolute_humidity).state;  // Moisture returned
+    float ah_out = id(zehnder_outdoor_absolute_humidity).state;
+    float ah_ext = id(zehnder_extract_absolute_humidity).state; // Moisture inside
+    float ah_sup = id(zehnder_supply_absolute_humidity).state;  // Moisture returned
 
     if (isnan(ah_out) || isnan(ah_ext) || isnan(ah_sup)) return NAN;
 
@@ -189,7 +192,7 @@
     
 - platform: template
   name: "Efficiency of energy retention"
-  id: wtw_enthalpy_efficiency
+  id: zehnder_efficiency_enthalpy
   unit_of_measurement: "%"
   icon: "mdi:chart-bell-curve-cumulative"
   state_class: measurement
@@ -204,14 +207,14 @@
 
     // 2. Collect states from your existing sensors
     float t_out = id(zehnder_outdoor_temp).state;
-    float ah_out = id(outdoor_absolute_humidity).state;
+    float ah_out = id(zehnder_outdoor_absolute_humidity).state;
     
     float t_ext = id(zehnder_extract_temp).state;
-    float ah_ext = id(extract_absolute_humidity).state;
+    float ah_ext = id(zehnder_extract_absolute_humidity).state;
     float f_ext = id(zehnder_exhaust_flow).state; // Flow leaving the house
     
     float t_sup = id(zehnder_supply_temp).state;
-    float ah_sup = id(supply_absolute_humidity).state;
+    float ah_sup = id(zehnder_supply_absolute_humidity).state;
     float f_sup = id(zehnder_supply_flow).state; // Flow entering the house
 
     if (isnan(t_out) || isnan(ah_out) || isnan(t_ext) || isnan(ah_ext) || 
@@ -241,12 +244,13 @@
 # --- comfort level
 - platform: template
   name: "Extract air comfort level"
+  id: zehnder_extract_comfort
   icon: "mdi:hand-extended"
   update_interval: 60s
   lambda: |-
     // 0. Grab the temperature and dew point 
     float t = id(zehnder_extract_temp).state;
-    float dp = id(extract_dew_point).state; 
+    float dp = id(zehnder_extract_dew_point).state; 
     if (isnan(t) || isnan(dp)) return {"Unknown"};
     // 1. Catch Temperature Extremes First
     if (t < 18.0) return {"Cold"};
@@ -264,11 +268,12 @@
 - platform: template
   name: "Supply air comfort level"
   icon: "mdi:hand-extended"
+  id: zehnder_supply_comfort
   update_interval: 60s
   lambda: |-
     // 0. Grab the temperature and dew point 
     float t = id(zehnder_supply_temp).state;
-    float dp = id(supply_dew_point).state; 
+    float dp = id(zehnder_supply_dew_point).state; 
     if (isnan(t) || isnan(dp)) return {"Unknown"};
     // 1. Catch Temperature Extremes First
     if (t < 18.0) return {"Cold"};
