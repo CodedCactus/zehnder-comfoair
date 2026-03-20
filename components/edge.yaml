@@ -61,6 +61,7 @@
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
+  accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_exhaust_temp).state;
     float ah = id(exhaust_absolute_humidity).state;
@@ -80,6 +81,7 @@
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
+  accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_extract_temp).state;
     float ah = id(extract_absolute_humidity).state;
@@ -99,6 +101,7 @@
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
+  accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_supply_temp).state;
     float ah = id(supply_absolute_humidity).state;
@@ -118,6 +121,7 @@
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
   state_class: measurement
+  accuracy_decimals: 0
   lambda: |-
     float t = id(zehnder_outdoor_temp).state;
     float ah = id(outdoor_absolute_humidity).state;
@@ -145,6 +149,7 @@
   unit_of_measurement: "g/m³"
   icon: mdi:water-plus
   state_class: measurement
+  accuracy_decimals: 2
   lambda: |-
     return id(outdoor_absolute_humidity).state - id(exhaust_absolute_humidity).state;
 
@@ -154,7 +159,7 @@
   unit_of_measurement: "kJ/h"
   icon: mdi:heat-wave
   state_class: measurement
-  entity_category: diagnostic
+  accuracy_decimals: 0
   lambda: |-
     return id(extract_enthalpy).state - id(supply_enthalpy).state;
 
