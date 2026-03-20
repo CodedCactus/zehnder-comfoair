@@ -56,7 +56,7 @@
 
 # --- enthalpy ---
 - platform: template
-  name: "Exhaust Enthalpy"
+  name: "Exhaust enthalpy"
   id: exhaust_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
@@ -76,7 +76,7 @@
     return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;     // Total Enthalpy 
 
 - platform: template
-  name: "Extract Enthalpy"
+  name: "Extract enthalpy"
   id: extract_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
@@ -96,7 +96,7 @@
     return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;     // Total Enthalpy 
     
 - platform: template
-  name: "Supply Enthalpy"
+  name: "Supply enthalpy"
   id: supply_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
@@ -116,7 +116,7 @@
     return ((h_dry * rho) + ((ah / 1000.0) * h_vap)) * flow;    // Total Enthalpy 
 
 - platform: template
-  name: "Outdoor Enthalpy"
+  name: "Outdoor enthalpy"
   id: outdoor_enthalpy
   icon: mdi:heat-wave
   unit_of_measurement: "kJ/h"
@@ -188,7 +188,7 @@
     return ((ah_sup - ah_out) / potential) * 100.0;
     
 - platform: template
-  name: "WTW Enthalpy Efficiency"
+  name: "Efficiency of energy retention"
   id: wtw_enthalpy_efficiency
   unit_of_measurement: "%"
   icon: "mdi:chart-bell-curve-cumulative"
