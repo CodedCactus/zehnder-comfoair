@@ -1,0 +1,29 @@
+name: Format & Validate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  esphome-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Step 1: Create a dummy secrets file to satisfy dependencies
+      - name: Create mock secrets.yaml
+        run: |
+          cat <<EOF > secrets.yaml
+          wifi_ssid: "Mock-SSID"
+          wifi_password: "Mock-Password"
+          api_encryption_key: "dummy_key_must_be_32_bytes_long="
+          EOF
+
+      # Step 2: Validate all YAML files in the repo
+      - name: Run ESPHome Valaidate
+        uses: esphome/build-action@v6
+        with:
+          version: latest
+          # This will look for all .yaml files in the root or a 'devices' folder
+          yaml-file: "*.yaml"
