@@ -98,7 +98,7 @@ packages:
     ref: main
     files: [components/zehnder.yaml,
             components/fan.yaml,           # comment out fan.yaml if you don't want fan control
-            components/extra-sensors.yaml] # comment out edge.yaml if you don't want extra entities
+            components/extra-sensors.yaml] # comment out extra-sensors.yaml if you don't want extra entities
     refresh: 0s
 
 output:
@@ -177,7 +177,7 @@ Have a look at the [Thermal Comfort integration](https://github.com/dolezsa/ther
 | Outdoor dew point                | °C   | The temperature to which air must be cooled to form dew (100% humidity) |
 | Supply dew point                 | °C   | Dew point is closely related to the perceived dryness of air |
 | Extract dew point                | °C   |      |
-| Exhaust dew point                | °C   | T    |
+| Exhaust dew point                | °C   |      |
 | Outdoor absolute humidity        | g/m³ | The amount of water vapor (g) present in 1m³ the air |
 | Supply absolute humidity         | g/m³ |      |
 | Extract absolute humidity        | g/m³ |      |
@@ -186,8 +186,8 @@ Have a look at the [Thermal Comfort integration](https://github.com/dolezsa/ther
 | Supply enthalpy                  | kJ/h | Enthalpy is for air what energy is for electricity |
 | Extract enthalpy                 | kJ/h |      |
 | Exhaust enthalpy                 | kJ/h |      |
-| Delta temperature                | °C   | The differnce between supply temperature and extract temperature |
-| Delta moisture                   | g/m³ | The differnce between outdoor humidity and exhaust humidity |
-| Delta energy                     | kJ/h | The differnce between supply enthalpy and exhaust enthalpy |
+| Delta temperature                | °C   | The difference between supply temperature and extract temperature |
+| Delta moisture                   | g/m³ | The difference between outdoor humidity and exhaust humidity |
+| Delta energy                     | kJ/h | The difference between supply enthalpy and extract enthalpy |
 | Efficiency of moisture retention | %    | The relative efficiency of moisture retention |
 | Efficiency of energy retention   | %    | The relative efficiency of energy retention |
