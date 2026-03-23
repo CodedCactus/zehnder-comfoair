@@ -1,4 +1,4 @@
-# --- extra sensors calculated on the edge device ---
+# --- extra sensors calculated on the ESPHome device ---
 sensor:
 
 # --- dew point ---
