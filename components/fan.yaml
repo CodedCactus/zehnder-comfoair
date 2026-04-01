@@ -74,14 +74,27 @@ script:
   - id: boost_start
     then:
       - lambda: |-
-          // 1. Save current state
-          id(pre_boost_fan_speed) = id(zehnder_fan).speed;
+          // 1. Save current state from software_request (map [0,1] -> [1..${fan_speed_count}])
+          {
+            int sc = ${fan_speed_count};
+            float soft = id(software_request);
+            int idx;
+            if (sc <= 1) {
+              idx = 1;
+            } else if (soft <= 0.0) {
+              idx = 1;
+            } else {
+              idx = 1 + (int)floor(soft * (sc - 1));
+              if (idx < 1) idx = 1;
+              if (idx > sc) idx = sc;
+            }
+            id(pre_boost_fan_speed) = idx;
+          }
       
           // 2. Activate Boost
           id(software_request) = 1.0;
           id(boost_active) = true;
           id(sync_fan_logic)->execute();
-
   - id: boost_stop
     then:
       - fan.turn_on:
