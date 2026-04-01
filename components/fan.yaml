@@ -75,7 +75,7 @@ script:
     then:
       - lambda: |-
           // 1. Save current state
-          id(pre_boost_fan_speed) = id(software_request);
+          id(pre_boost_fan_speed) = id(zehnder_fan).speed;
       
           // 2. Activate Boost
           id(software_request) = 1.0;
