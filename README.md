@@ -21,7 +21,7 @@ The pin-out is shown in the image below:
 | C4        | Malfunction indicator (5V when malfunction is detected) |
 
 ### Hardware
-The example hardware is based on a nodeMCU V2 and a MAX485 module that converts the RS485 signal to UART. 
+The example hardware is based on a ESP32 and a MAX485 module that converts the RS485 signal to UART. 
 
 Since the RS485 connection is half-duplex, it cannot send and receive data at the same time, unlike UART. To overcome this issue, the module uses flow control to determine if it should be sending or receiving data. Two different types of module are available, with and without automatic flow control.
 
@@ -78,7 +78,7 @@ The following schematic shows how to connect the hardware.
 ### Example — minimal configuration
 Minimal ESPHome configuration required to use this component. Example files for other boards and setups are available in the [examples](examples) directory — adjust pins and secrets (Wi‑Fi, API/OTA keys) to match your hardware.
 
-Basic configuration (ESP8266 example):
+Basic configuration (ESP32 example):
 
 ```yaml
 substitutions:
@@ -102,21 +102,21 @@ packages:
     refresh: 0s
 
 output:
-  - platform: esp8266_pwm
-    pin: GPIO5
-    frequency: 1kHz
+  - platform: esp32_dac
+    pin: GPIO25
     id: fan_output
 
 logger:
   baud_rate: 0    # required on ESP8266 if using hardware UART for RS485
 ```
 
-On ESP32 the output can be configured as follows:
+On ESP8266 the output can be configured as follows:
 
 ```yaml
 output:
-  - platform: esp32_dac
-    pin: GPIO25
+  - platform: esp8266_pwm
+    pin: GPIO5
+    frequency: 1kHz
     id: fan_output
 ```
 
