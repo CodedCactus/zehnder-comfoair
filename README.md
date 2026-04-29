@@ -105,19 +105,6 @@ output:
   - platform: esp32_dac
     pin: GPIO25
     id: fan_output
-
-logger:
-  baud_rate: 0    # required on ESP8266 if using hardware UART for RS485
-```
-
-On ESP8266 the output can be configured as follows:
-
-```yaml
-output:
-  - platform: esp8266_pwm
-    pin: GPIO5
-    frequency: 1kHz
-    id: fan_output
 ```
 
 Notes:
