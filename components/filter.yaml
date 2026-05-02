@@ -84,7 +84,6 @@ number:
     min_value: 30
     max_value: 365
     step: 1
-    mode: slider
     entity_category: config
     lambda: |-
       return id(filter_replacement_interval_days);
@@ -92,3 +91,4 @@ number:
       then:
         - lambda: |-
             id(filter_replacement_interval_days) = x;
+            id(filter_replacement_in).update();
