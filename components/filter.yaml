@@ -92,3 +92,24 @@ number:
         - lambda: |-
             id(filter_replacement_interval_days) = x;
             id(filter_replacement_in).update();
+
+switch:
+  - platform: template
+    name: "Auto detect filter replacement"
+    id: auto_reset_on_standby
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_ON
+    optimistic: true
+
+text_sensor:
+  - platform: template
+    name: "Zehnder Status Monitor"
+    id: zehnder_status_monitor
+    internal: true
+    lambda: return id(zehnder_status).state;
+    on_value:
+      then:
+        - lambda: |-
+            if (x == "Standby" && id(auto_reset_on_standby).state) {
+              id(reset_filter_timer).press();
+            }
