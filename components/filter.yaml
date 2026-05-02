@@ -1,0 +1,106 @@
+globals:
+  - id: filter_operating_hours
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+  - id: filter_replacement_interval_hours
+    type: int
+    restore_value: yes
+    initial_value: '2160'  # Default 90 days (90 * 24 = 2160 hours)
+
+sensor:
+# --- filter replacement timer ---
+- platform: template
+  name: "Filter operating hours"
+  id: zehnder_filter_operating_hours
+  icon: mdi:clock-outline
+  unit_of_measurement: "h"
+  state_class: "total_increasing"
+  entity_category: "diagnostic"
+  accuracy_decimals: 1
+  update_interval: 60s
+  lambda: |-
+    // Calculate operating hours based on average fan duty cycle
+    static float last_update = 0;
+    float current_time = millis() / 1000.0 / 3600.0; // Convert to hours
+    float time_diff = current_time - last_update;
+
+    if (last_update == 0) {
+      last_update = current_time;
+      return id(filter_operating_hours);
+    }
+
+    // Average duty cycle of both fans (weighted by their typical operation)
+    float exhaust_duty = id(zehnder_exhaust_duty).state / 100.0;
+    float supply_duty = id(zehnder_supply_duty).state / 100.0;
+    float avg_duty = (exhaust_duty + supply_duty) / 2.0;
+
+    // Only count time when fans are actually running (duty > 0)
+    if (avg_duty > 0.01) {
+      id(filter_operating_hours) += time_diff * avg_duty;
+    }
+
+    last_update = current_time;
+    return id(filter_operating_hours);
+
+- platform: template
+  name: "Filter replacement in"
+  id: zehnder_filter_replacement_in
+  icon: mdi:air-filter
+  unit_of_measurement: "days"
+  state_class: "measurement"
+  entity_category: "diagnostic"
+  accuracy_decimals: 1
+  update_interval: 300s  # Update every 5 minutes
+  lambda: |-
+    float hours_used = id(filter_operating_hours).state;
+    float interval_hours = id(filter_replacement_interval_hours);
+    float hours_remaining = interval_hours - hours_used;
+
+    if (hours_remaining <= 0) {
+      return 0.0;  // Already due for replacement
+    }
+
+    return hours_remaining / 24.0;  // Convert to days
+
+binary_sensor:
+- platform: template
+  name: "Filter replacement needed"
+  id: zehnder_filter_replacement_needed
+  icon: mdi:air-filter
+  device_class: problem
+  entity_category: "diagnostic"
+  lambda: |-
+    float hours_used = id(filter_operating_hours).state;
+    float interval_hours = id(filter_replacement_interval_hours);
+    return hours_used >= interval_hours;
+
+button:
+  - platform: template
+    name: "Reset filter timer"
+    id: zehnder_reset_filter_timer
+    icon: mdi:restart
+    entity_category: "config"
+    on_press:
+      then:
+        - lambda: |-
+            id(filter_operating_hours) = 0.0;
+            id(zehnder_filter_operating_hours).update();
+
+number:
+  - platform: template
+    name: "Filter replacement interval"
+    id: zehnder_filter_replacement_interval
+    icon: mdi:calendar-clock
+    unit_of_measurement: "days"
+    min_value: 30
+    max_value: 365
+    step: 1
+    mode: slider
+    entity_category: "config"
+    lambda: |-
+      return id(filter_replacement_interval_hours) / 24.0;
+    set_action:
+      then:
+        - lambda: |-
+            id(filter_replacement_interval_hours) = x * 24.0;

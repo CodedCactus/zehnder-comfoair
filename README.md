@@ -98,6 +98,7 @@ packages:
     ref: main
     files: [components/zehnder.yaml,
             components/fan.yaml,           # comment out fan.yaml if you don't want fan control
+            components/filter.yaml,        # comment out filter.yaml if you don't want filter replacement timer
             components/extra-sensors.yaml] # comment out extra-sensors.yaml if you don't want extra entities
     refresh: 0s
 
@@ -178,3 +179,24 @@ Have a look at the [Thermal Comfort integration](https://github.com/dolezsa/ther
 | Delta energy                     | kJ/h | The difference between supply enthalpy and extract enthalpy |
 | Efficiency of moisture retention | %    | The relative efficiency of moisture retention |
 | Efficiency of energy retention   | %    | The relative efficiency of energy retention |
+
+### Filter Replacement Timer
+
+The component includes an intelligent filter replacement timer that tracks operating hours based on actual fan usage. This provides more accurate filter replacement recommendations compared to simple calendar-based timers.
+
+**Features:**
+- **Operating Hours Tracking**: Monitors cumulative fan operating hours weighted by duty cycle
+- **Configurable Interval**: Set custom replacement intervals (30-365 days, default 90 days)
+- **Smart Alerts**: Binary sensor indicates when replacement is due
+- **Remaining Time**: Shows days until next replacement is needed
+- **Manual Reset**: Button to reset timer after filter replacement
+
+**Entities:**
+- `sensor.filter_operating_hours` - Total accumulated operating hours
+- `sensor.filter_replacement_in` - Days until replacement needed
+- `binary_sensor.filter_replacement_needed` - True when replacement is due
+- `number.filter_replacement_interval` - Configure replacement interval (days)
+- `button.reset_filter_timer` - Reset timer after filter replacement
+
+**Configuration:**
+The timer starts at 0 hours and accumulates time based on fan operation. The default replacement interval is 90 days (2160 hours) but can be adjusted via the `Filter replacement interval` number entity in Home Assistant.

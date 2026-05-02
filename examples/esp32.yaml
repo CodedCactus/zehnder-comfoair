@@ -36,7 +36,8 @@ packages:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: 'main'
     files: [components/zehnder.yaml,
-            components/fan.yaml]
+            components/fan.yaml,
+            components/filter.yaml]
     refresh: 0s
 
 output:
