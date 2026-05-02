@@ -1,106 +1,94 @@
+time:
+  - platform: homeassistant
+    id: ha_time
+
 globals:
-  - id: filter_operating_hours
+  - id: filter_reset_timestamp
+    type: time_t
+    restore_value: yes
+    initial_value: '0'
+
+  - id: filter_replacement_interval_days
     type: float
     restore_value: yes
-    initial_value: '0.0'
-  - id: filter_replacement_interval_hours
-    type: int
-    restore_value: yes
-    initial_value: '2160'  # Default 90 days (90 * 24 = 2160 hours)
+    initial_value: '90'
 
+# filter age in days
 sensor:
-# --- filter replacement timer ---
-- platform: template
-  name: "Filter operating hours"
-  id: zehnder_filter_operating_hours
-  icon: mdi:clock-outline
-  unit_of_measurement: "h"
-  state_class: "total_increasing"
-  entity_category: "diagnostic"
-  accuracy_decimals: 1
-  update_interval: 60s
-  lambda: |-
-    // Calculate operating hours based on average fan duty cycle
-    static float last_update = 0;
-    float current_time = millis() / 1000.0 / 3600.0; // Convert to hours
-    float time_diff = current_time - last_update;
+  - platform: template
+    name: "Filter age"
+    id: filter_age_days
+    unit_of_measurement: "d"
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 1
+    update_interval: 60s
 
-    if (last_update == 0) {
-      last_update = current_time;
-      return id(filter_operating_hours);
-    }
+    lambda: |-
+      auto now = id(ha_time).now();
+      if (!now.is_valid()) return NAN;
+      if (id(filter_reset_timestamp) == 0) return 0.0;
 
-    // Average duty cycle of both fans (weighted by their typical operation)
-    float exhaust_duty = id(zehnder_exhaust_duty).state / 100.0;
-    float supply_duty = id(zehnder_supply_duty).state / 100.0;
-    float avg_duty = (exhaust_duty + supply_duty) / 2.0;
+      return (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
 
-    // Only count time when fans are actually running (duty > 0)
-    if (avg_duty > 0.01) {
-      id(filter_operating_hours) += time_diff * avg_duty;
-    }
+# time remaining until filter replacement is needed
+  - platform: template
+    name: "Filter replacement in"
+    id: filter_replacement_in
+    unit_of_measurement: "d"
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 1
+    update_interval: 300s
 
-    last_update = current_time;
-    return id(filter_operating_hours);
+    lambda: |-
+      if (isnan(id(filter_age_days).state)) return NAN;
 
-- platform: template
-  name: "Filter replacement in"
-  id: zehnder_filter_replacement_in
-  icon: mdi:air-filter
-  unit_of_measurement: "days"
-  state_class: "measurement"
-  entity_category: "diagnostic"
-  accuracy_decimals: 1
-  update_interval: 300s  # Update every 5 minutes
-  lambda: |-
-    float hours_used = id(filter_operating_hours).state;
-    float interval_hours = id(filter_replacement_interval_hours);
-    float hours_remaining = interval_hours - hours_used;
+      float remaining = id(filter_replacement_interval_days) - id(filter_age_days).state;
+      return remaining > 0 ? remaining : 0.0;
 
-    if (hours_remaining <= 0) {
-      return 0.0;  // Already due for replacement
-    }
-
-    return hours_remaining / 24.0;  // Convert to days
-
+# replacement needed sensor
 binary_sensor:
-- platform: template
-  name: "Filter replacement needed"
-  id: zehnder_filter_replacement_needed
-  icon: mdi:air-filter
-  device_class: problem
-  entity_category: "diagnostic"
-  lambda: |-
-    float hours_used = id(filter_operating_hours).state;
-    float interval_hours = id(filter_replacement_interval_hours);
-    return hours_used >= interval_hours;
+  - platform: template
+    name: "Filter replacement needed"
+    id: filter_replacement_needed
+    device_class: problem
+    entity_category: diagnostic
 
+    lambda: |-
+      if (isnan(id(filter_age_days).state)) return false;
+
+      return id(filter_age_days).state >= id(filter_replacement_interval_days);
+
+# reset timer button
 button:
   - platform: template
     name: "Reset filter timer"
-    id: zehnder_reset_filter_timer
-    icon: mdi:restart
-    entity_category: "config"
+    id: reset_filter_timer
+    entity_category: config
+
     on_press:
       then:
         - lambda: |-
-            id(filter_operating_hours) = 0.0;
-            id(zehnder_filter_operating_hours).update();
+            auto now = id(ha_time).now();
+            if (now.is_valid()) {
+              id(filter_reset_timestamp) = now.timestamp;
+            }
 
+# configuration for the filter replacement interval (in days)
 number:
   - platform: template
     name: "Filter replacement interval"
-    id: zehnder_filter_replacement_interval
-    icon: mdi:calendar-clock
+    id: filter_replacement_interval
     unit_of_measurement: "days"
     min_value: 30
     max_value: 365
     step: 1
     mode: slider
-    entity_category: "config"
+    entity_category: config
     lambda: |-
-      return id(filter_replacement_interval_hours) / 24.0;
+      return id(filter_replacement_interval_days);
     set_action:
       then:
         - lambda: |-
-            id(filter_replacement_interval_hours) = x * 24.0;
+            id(filter_replacement_interval_days) = x;
