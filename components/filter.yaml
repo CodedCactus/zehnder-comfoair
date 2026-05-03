@@ -3,8 +3,8 @@ time:
     id: ha_time
     on_time_sync:
       then:
-        - component.update: filter_age_days
-        - component.update: filter_replacement_in
+        - component.update: zehnder_filter_age
+        - component.update: zehnder_filter_remaining
 
 globals:
   - id: filter_reset_timestamp
@@ -20,7 +20,8 @@ globals:
 sensor:
   - platform: template
     name: "Filter age"
-    id: filter_age_days
+    id: zehnder_filter_age
+    icon: mdi:clock-start
     unit_of_measurement: "d"
     state_class: measurement
     entity_category: diagnostic
@@ -44,8 +45,8 @@ sensor:
 
   # time remaining until filter replacement is needed
   - platform: template
-    name: "Filter replacement in"
-    id: filter_replacement_in
+    name: "Filter Remaining"
+    id: zehnder_filter_remaining
     unit_of_measurement: "d"
     state_class: measurement
     entity_category: diagnostic
@@ -75,7 +76,7 @@ sensor:
 binary_sensor:
   - platform: template
     name: "Filter status"
-    id: filter_status
+    id: zehnder_filter_status
     device_class: problem
     entity_category: diagnostic
 
@@ -99,7 +100,7 @@ binary_sensor:
 button:
   - platform: template
     name: "Reset filter timer"
-    id: reset_filter_timer
+    id: zehnder_reset_filter_timer
     entity_category: config
 
     on_press:
@@ -109,14 +110,14 @@ button:
             if (now.is_valid()) {
               id(filter_reset_timestamp) = now.timestamp;
             }
-        - component.update: filter_age_days
-        - component.update: filter_replacement_in
+        - component.update: zehnder_filter_age
+        - component.update: zehnder_filter_remaining
 
 # configuration for the filter replacement interval (in days)
 number:
   - platform: template
     name: "Filter replacement interval"
-    id: filter_replacement_interval
+    id: zehnder_filter_replacement_interval
     unit_of_measurement: "days"
     min_value: 30
     max_value: 365
@@ -128,12 +129,12 @@ number:
       then:
         - lambda: |-
             id(filter_replacement_interval_days) = x;
-        - component.update: filter_replacement_in
+        - component.update: zehnder_filter_remaining
 
 switch:
   - platform: template
-    name: "Auto detect filter replacement"
-    id: auto_reset_on_standby
+    name: "Detect filter change"
+    id: zehnder_detect_filter_change
     entity_category: config
     restore_mode: RESTORE_DEFAULT_ON
     optimistic: true
@@ -147,6 +148,6 @@ text_sensor:
     on_value:
       then:
         - lambda: |-
-            if (x == "Standby" && id(auto_reset_on_standby).state) {
-              id(reset_filter_timer).press();
+            if (x == "Standby" && id(zehnder_detect_filter_change).state) {
+              id(zehnder_reset_filter_timer).press();
             }
