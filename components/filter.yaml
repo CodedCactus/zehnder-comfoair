@@ -1,6 +1,10 @@
 time:
   - platform: homeassistant
     id: ha_time
+    on_time_sync:
+      then:
+        - component.update: filter_age_days
+        - component.update: filter_replacement_in
 
 globals:
   - id: filter_reset_timestamp
@@ -9,7 +13,7 @@ globals:
     initial_value: '0'
 
   - id: filter_replacement_interval_days
-    type: float
+    type: double
     restore_value: yes
     initial_value: '90'
 
@@ -22,16 +26,18 @@ sensor:
     state_class: measurement
     entity_category: diagnostic
     accuracy_decimals: 1
-    update_interval: 60s
+    update_interval: 300s
 
     lambda: |-
       auto now = id(ha_time).now();
-      if (!now.is_valid()) return NAN;
-      if (id(filter_reset_timestamp) == 0) return 0.0;
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
 
-      return (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
+      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
+      if (age < 0) age = 0;
 
-# time remaining until filter replacement is needed
+      return age;
+
+  # time remaining until filter replacement is needed
   - platform: template
     name: "Filter replacement in"
     id: filter_replacement_in
@@ -42,9 +48,13 @@ sensor:
     update_interval: 300s
 
     lambda: |-
-      if (isnan(id(filter_age_days).state)) return NAN;
+      auto now = id(ha_time).now();
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
 
-      float remaining = id(filter_replacement_interval_days) - id(filter_age_days).state;
+      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
+      if (age < 0) age = 0;
+
+      double remaining = id(filter_replacement_interval_days) - age;
       return remaining > 0 ? remaining : 0.0;
 
 # replacement needed sensor
@@ -56,9 +66,13 @@ binary_sensor:
     entity_category: diagnostic
 
     lambda: |-
-      if (isnan(id(filter_age_days).state)) return false;
+      auto now = id(ha_time).now();
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
 
-      return id(filter_age_days).state >= id(filter_replacement_interval_days);
+      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
+      if (age < 0) age = 0;
+
+      return age >= id(filter_replacement_interval_days);
 
 # reset timer button
 button:
@@ -74,6 +88,8 @@ button:
             if (now.is_valid()) {
               id(filter_reset_timestamp) = now.timestamp;
             }
+        - component.update: filter_age_days
+        - component.update: filter_replacement_in
 
 # configuration for the filter replacement interval (in days)
 number:
@@ -85,13 +101,15 @@ number:
     max_value: 365
     step: 1
     entity_category: config
+
     lambda: |-
       return id(filter_replacement_interval_days);
+
     set_action:
       then:
         - lambda: |-
             id(filter_replacement_interval_days) = x;
-            id(filter_replacement_in).update();
+        - component.update: filter_replacement_in
 
 switch:
   - platform: template
@@ -107,6 +125,7 @@ text_sensor:
     id: zehnder_status_monitor
     internal: true
     lambda: return id(zehnder_status).state;
+
     on_value:
       then:
         - lambda: |-
