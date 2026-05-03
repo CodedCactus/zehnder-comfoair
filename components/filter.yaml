@@ -25,17 +25,17 @@ sensor:
     unit_of_measurement: "d"
     state_class: measurement
     entity_category: diagnostic
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     update_interval: 300s
 
     lambda: |-
       auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return NAN;
 
-      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
-      if (age < 0) age = 0;
+      time_t diff = now.timestamp - id(filter_reset_timestamp);
+      if (diff < 0) diff = 0;
 
-      return age;
+      return (int)(diff / 86400);
 
   # time remaining until filter replacement is needed
   - platform: template
@@ -44,35 +44,39 @@ sensor:
     unit_of_measurement: "d"
     state_class: measurement
     entity_category: diagnostic
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     update_interval: 300s
 
     lambda: |-
       auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return NAN;
 
-      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
-      if (age < 0) age = 0;
+      time_t diff = now.timestamp - id(filter_reset_timestamp);
+      if (diff < 0) diff = 0;
 
-      double remaining = id(filter_replacement_interval_days) - age;
-      return remaining > 0 ? remaining : 0.0;
+      int age_days = diff / 86400;
+      int remaining = id(filter_replacement_interval_days) - age_days;
 
-# replacement needed sensor
+      return remaining > 0 ? remaining : 0;
+
+# replacement status
 binary_sensor:
   - platform: template
-    name: "Filter replacement needed"
-    id: filter_replacement_needed
+    name: "Filter status"
+    id: filter_status
     device_class: problem
     entity_category: diagnostic
 
     lambda: |-
       auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return {};
+      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return false;
 
-      double age = (now.timestamp - id(filter_reset_timestamp)) / 86400.0;
-      if (age < 0) age = 0;
+      time_t diff = now.timestamp - id(filter_reset_timestamp);
+      if (diff < 0) diff = 0;
 
-      return age >= id(filter_replacement_interval_days);
+      int age_days = diff / 86400;
+
+      return age_days >= id(filter_replacement_interval_days);
 
 # reset timer button
 button:
