@@ -56,7 +56,9 @@ sensor:
 
       double age_days = diff / 86400.0;
 
-      return id(filter_replacement_interval_days) - age_days;
+      double remaining = id(filter_replacement_interval_days) - age_days;
+
+      return remaining;
 
 # replacement status
 binary_sensor:
