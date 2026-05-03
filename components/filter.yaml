@@ -35,7 +35,7 @@ sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      return (int)(diff / 86400);
+      return (int) floor(diff / 86400));
 
   # time remaining until filter replacement is needed
   - platform: template
@@ -54,11 +54,9 @@ sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      double age_days = diff / 86400.0;
+      double age = diff / id(filter_replacement_interval_days)*86400.0;
 
-      double remaining = id(filter_replacement_interval_days) - age_days;
-
-      return remaining;
+      return = ceil(age/86400.0));
 
 # replacement status
 binary_sensor:
@@ -75,9 +73,9 @@ binary_sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      double age_days = diff / 86400.0;
-
-      return age_days >= id(filter_replacement_interval_days);
+      double age = diff / id(filter_replacement_interval_days)*86400.0;
+      
+      return age >= id(filter_replacement_interval_days/86400.0);
 
 # reset timer button
 button:
