@@ -54,7 +54,8 @@ sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      int age_days = diff / 86400;
+      double age_days = diff / 86400.0;
+
       return id(filter_replacement_interval_days) - age_days;
 
 # replacement status
@@ -72,7 +73,7 @@ binary_sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      int age_days = diff / 86400;
+      double age_days = diff / 86400.0;
 
       return age_days >= id(filter_replacement_interval_days);
 
