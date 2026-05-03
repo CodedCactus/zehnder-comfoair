@@ -58,7 +58,7 @@ Three options are available for generating the required signal:
 - External DAC (e.g. DFRobot Gravity GP8211S) for true 0–10 V output; required if multiple wired 0–10 V inputs are used (ComfoConnect Splitter).
 
 ### Filter Replacement Timer
-Since the filter status cannot be read directly from the ventilation unit, the component includes an filter replacement timer that tracks operating hours. 
+Since the filter status cannot be read directly from the ventilation unit, the component includes a filter replacement timer that tracks operating hours. 
 
 **Features:**
 - **Operating Hours Tracking**: Monitors filter age.
