@@ -15,7 +15,7 @@ globals:
   - id: filter_replacement_interval_days
     type: double
     restore_value: yes
-    initial_value: '90'
+    initial_value: '180'
 
 # filter age in days
 sensor:
