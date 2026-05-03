@@ -35,7 +35,7 @@ sensor:
       time_t diff = now.timestamp - id(filter_reset_timestamp);
       if (diff < 0) diff = 0;
 
-      return (int) floor(diff / 86400));
+      return (int) floor(diff / 86400);
 
   # time remaining until filter replacement is needed
   - platform: template
@@ -51,12 +51,17 @@ sensor:
       auto now = id(ha_time).now();
       if (!now.is_valid() || id(filter_reset_timestamp) == 0) return NAN;
 
-      time_t diff = now.timestamp - id(filter_reset_timestamp);
-      if (diff < 0) diff = 0;
+      time_t age = now.timestamp - id(filter_reset_timestamp);
+      if (age < 0) age = 0;
 
-      double age = diff / id(filter_replacement_interval_days)*86400.0;
+      double time_left = (id(filter_replacement_interval_days)*86400.0) - age;
+      double remaining = time_left/86400.0;
 
-      return = ceil(age/86400.0));
+      if (-1 < remaining && remaining < 0) {
+        return 0;
+      }
+
+      return ceil(remaining);
 
 # replacement status
 binary_sensor:
@@ -70,12 +75,10 @@ binary_sensor:
       auto now = id(ha_time).now();
       if (!now.is_valid() || id(filter_reset_timestamp) == 0) return false;
 
-      time_t diff = now.timestamp - id(filter_reset_timestamp);
-      if (diff < 0) diff = 0;
+      time_t age = now.timestamp - id(filter_reset_timestamp);
+      if (age < 0) age = 0;
 
-      double age = diff / id(filter_replacement_interval_days)*86400.0;
-      
-      return age >= id(filter_replacement_interval_days/86400.0);
+      return age >= id(filter_replacement_interval_days)*86400.0;
 
 # reset timer button
 button:
