@@ -47,6 +47,7 @@ sensor:
   - platform: template
     name: "Filter Remaining"
     id: zehnder_filter_remaining
+    icon: mdi:clock-start
     unit_of_measurement: "d"
     state_class: measurement
     entity_category: diagnostic
@@ -77,6 +78,7 @@ binary_sensor:
   - platform: template
     name: "Filter status"
     id: zehnder_filter_status
+    icon: mdi:air-filter
     device_class: problem
     entity_category: diagnostic
 
@@ -118,6 +120,7 @@ number:
   - platform: template
     name: "Filter replacement interval"
     id: zehnder_filter_replacement_interval
+    icon: mdi:calendar-clock
     unit_of_measurement: "days"
     min_value: 30
     max_value: 365
