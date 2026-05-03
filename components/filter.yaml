@@ -17,7 +17,6 @@ globals:
     restore_value: yes
     initial_value: '180'
 
-# filter age in days
 sensor:
   - platform: template
     name: "Filter age"
@@ -29,13 +28,19 @@ sensor:
     update_interval: 300s
 
     lambda: |-
-      auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return NAN;
+      const auto now = id(ha_time).now();
+      const uint32_t reset_ts = id(filter_reset_timestamp);
 
-      time_t diff = now.timestamp - id(filter_reset_timestamp);
-      if (diff < 0) diff = 0;
+      if (!now.is_valid() || reset_ts == 0) {
+        return {};
+      }
 
-      return (int) floor(diff / 86400);
+      const int32_t diff = static_cast<int32_t>(now.timestamp - reset_ts);
+      if (diff <= 0) {
+        return 0;
+      }
+
+      return diff / 86400;
 
   # time remaining until filter replacement is needed
   - platform: template
@@ -48,20 +53,23 @@ sensor:
     update_interval: 300s
 
     lambda: |-
-      auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return NAN;
+      const auto now = id(ha_time).now();
+      const uint32_t reset_ts = id(filter_reset_timestamp);
 
-      time_t age = now.timestamp - id(filter_reset_timestamp);
-      if (age < 0) age = 0;
-
-      double time_left = (id(filter_replacement_interval_days)*86400.0) - age;
-      double remaining = time_left/86400.0;
-
-      if (-1 < remaining && remaining < 0) {
-        return 0;
+      if (!now.is_valid() || reset_ts == 0) {
+        return {};
       }
 
-      return ceil(remaining);
+      const int32_t age = static_cast<int32_t>(now.timestamp - reset_ts);
+      const int32_t interval_sec = id(filter_replacement_interval_days) * 86400;
+
+      const int32_t remaining_sec = interval_sec - age;
+
+      if (remaining_sec > 0) {
+        return (remaining_sec + 86399) / 86400; // ceil
+      } else {
+        return 0;
+      }
 
 # replacement status
 binary_sensor:
@@ -72,13 +80,20 @@ binary_sensor:
     entity_category: diagnostic
 
     lambda: |-
-      auto now = id(ha_time).now();
-      if (!now.is_valid() || id(filter_reset_timestamp) == 0) return false;
+      const auto now = id(ha_time).now();
+      const uint32_t reset_ts = id(filter_reset_timestamp);
 
-      time_t age = now.timestamp - id(filter_reset_timestamp);
-      if (age < 0) age = 0;
+      if (!now.is_valid() || reset_ts == 0) {
+        return false;
+      }
 
-      return age >= id(filter_replacement_interval_days)*86400.0;
+      const int32_t age = static_cast<int32_t>(now.timestamp - reset_ts);
+      if (age <= 0) {
+        return false;
+      }
+
+      const int32_t threshold_sec = id(filter_replacement_interval_days) * 86400;
+      return age >= threshold_sec;
 
 # reset timer button
 button:
@@ -107,10 +122,8 @@ number:
     max_value: 365
     step: 1
     entity_category: config
-
     lambda: |-
       return id(filter_replacement_interval_days);
-
     set_action:
       then:
         - lambda: |-
@@ -131,7 +144,6 @@ text_sensor:
     id: zehnder_status_monitor
     internal: true
     lambda: return id(zehnder_status).state;
-
     on_value:
       then:
         - lambda: |-
