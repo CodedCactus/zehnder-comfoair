@@ -26,13 +26,21 @@ jobs:
       - name: Create dummy secrets
         run: |
           mkdir -p examples
-          cat > examples/secrets.yaml <<'EOF'
-          wifi_ssid: "ci_ssid"
-          wifi_password: "ci_password"
-          api_key: "ci_api_key"
-          ota_password: "ci_ota_password"
-          device_api_key: "ci_device_api_key"
-          EOF
+          python - <<'PY'
+          import base64, os
+          def key():
+              return base64.b64encode(os.urandom(32)).decode()
+          data = {
+              'wifi_ssid': 'ci_ssid',
+              'wifi_password': 'ci_password',
+              'api_key': key(),
+              'ota_password': 'ci_ota_password',
+              'device_api_key': key(),
+          }
+          with open('examples/secrets.yaml', 'w') as f:
+              for k, v in data.items():
+                  f.write(f'{k}: "{v}"\n')
+          PY
 
       - name: Find ESPHome example configs
         id: find-configs
