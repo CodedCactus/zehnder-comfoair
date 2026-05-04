@@ -21,6 +21,7 @@ jobs:
             ! -name 'esp32_external_dac.yaml' | sort | jq -R -s -c 'split("\n")[:-1]')
           echo "configs=$configs" >> "$GITHUB_OUTPUT"
 
+
   validate:
     runs-on: ubuntu-latest
     needs: prepare
@@ -36,12 +37,11 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-          cache-dependency-path: requirements.txt
 
-- name: Install dependencies
-  run: pip install -r requirements.txt
-      - name: Install ESPHome
-        run: pip install esphome
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Create dummy secrets
         run: |
@@ -50,6 +50,7 @@ jobs:
           import base64, os
           def key():
               return base64.b64encode(os.urandom(32)).decode()
+
           data = {
               'wifi_ssid': 'ci_ssid',
               'wifi_password': 'ci_password',
@@ -57,6 +58,7 @@ jobs:
               'ota_password': 'ci_ota_password',
               'device_api_key': key(),
           }
+
           with open('examples/secrets.yaml', 'w') as f:
               for k, v in data.items():
                   f.write(f'{k}: "{v}"\n')
@@ -64,6 +66,7 @@ jobs:
 
       - name: Validate config
         run: esphome config "${{ matrix.config }}"
+
 
   compile:
     runs-on: ubuntu-latest
@@ -81,8 +84,10 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install ESPHome
-        run: pip install esphome
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Create dummy secrets
         run: |
@@ -91,6 +96,7 @@ jobs:
           import base64, os
           def key():
               return base64.b64encode(os.urandom(32)).decode()
+
           data = {
               'wifi_ssid': 'ci_ssid',
               'wifi_password': 'ci_password',
@@ -98,6 +104,7 @@ jobs:
               'ota_password': 'ci_ota_password',
               'device_api_key': key(),
           }
+
           with open('examples/secrets.yaml', 'w') as f:
               for k, v in data.items():
                   f.write(f'{k}: "{v}"\n')
