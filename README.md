@@ -1,3 +1,5 @@
+[![ESPHome CI](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml/badge.svg)](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml)
+
 ## ESPHome Zehnder ComfoAir E300/E400
 Interact with Zehnder ComfoAir E300/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
 
