@@ -25,7 +25,8 @@ jobs:
 
       - name: Create dummy secrets
         run: |
-          cat > dummy_secrets.yaml <<'EOF'
+          mkdir -p examples
+          cat > examples/secrets.yaml <<'EOF'
           wifi_ssid: "ci_ssid"
           wifi_password: "ci_password"
           api_key: "ci_api_key"
@@ -45,12 +46,12 @@ jobs:
         run: |
           while IFS= read -r cfg; do
             echo "Validating $cfg"
-            esphome config "$cfg" --secret-file dummy_secrets.yaml
+            esphome config "$cfg"
           done <<< "${{ steps.find-configs.outputs.configs }}"
 
       - name: Compile example configs
         run: |
           while IFS= read -r cfg; do
             echo "Compiling $cfg"
-            esphome compile "$cfg" --secret-file dummy_secrets.yaml
+            esphome compile "$cfg"
           done <<< "${{ steps.find-configs.outputs.configs }}"
