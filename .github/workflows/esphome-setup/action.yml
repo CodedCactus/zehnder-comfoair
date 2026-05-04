@@ -1,0 +1,50 @@
+name: "ESPHome Setup"
+description: "Sets up Python, installs requirements, and optionally creates CI secrets"
+
+inputs:
+  requirements-file:
+    description: "Path to requirements.txt"
+    required: false
+    default: "requirements.txt"
+
+  create-secrets:
+    description: "Whether to generate dummy secrets"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: "pip"
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r "${{ inputs.requirements-file }}"
+
+    - name: Create dummy secrets
+      if: ${{ inputs.create-secrets == 'true' }}
+      shell: python
+      run: |
+        import base64, os
+
+        def key():
+            return base64.b64encode(os.urandom(32)).decode()
+
+        data = {
+            'wifi_ssid': 'ci_ssid',
+            'wifi_password': 'ci_password',
+            'api_key': key(),
+            'ota_password': 'ci_ota_password',
+            'device_api_key': key(),
+        }
+
+        os.makedirs("examples", exist_ok=True)
+
+        with open("examples/secrets.yaml", "w") as f:
+            for k, v in data.items():
+                f.write(f'{k}: "{v}"\n')

@@ -33,36 +33,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: ESPHome setup
+        uses: ./.github/actions/esphome-setup
         with:
-          python-version: '3.12'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Create dummy secrets
-        run: |
-          mkdir -p examples
-          python - <<'PY'
-          import base64, os
-          def key():
-              return base64.b64encode(os.urandom(32)).decode()
-
-          data = {
-              'wifi_ssid': 'ci_ssid',
-              'wifi_password': 'ci_password',
-              'api_key': key(),
-              'ota_password': 'ci_ota_password',
-              'device_api_key': key(),
-          }
-
-          with open('examples/secrets.yaml', 'w') as f:
-              for k, v in data.items():
-                  f.write(f'{k}: "{v}"\n')
-          PY
+          create-secrets: "true"
 
       - name: Validate config
         run: esphome config "${{ matrix.config }}"
@@ -79,36 +53,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: ESPHome setup
+        uses: ./.github/actions/esphome-setup
         with:
-          python-version: '3.12'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Create dummy secrets
-        run: |
-          mkdir -p examples
-          python - <<'PY'
-          import base64, os
-          def key():
-              return base64.b64encode(os.urandom(32)).decode()
-
-          data = {
-              'wifi_ssid': 'ci_ssid',
-              'wifi_password': 'ci_password',
-              'api_key': key(),
-              'ota_password': 'ci_ota_password',
-              'device_api_key': key(),
-          }
-
-          with open('examples/secrets.yaml', 'w') as f:
-              for k, v in data.items():
-                  f.write(f'{k}: "{v}"\n')
-          PY
+          create-secrets: "true"
 
       - name: Compile config
         run: esphome compile "${{ matrix.config }}"
