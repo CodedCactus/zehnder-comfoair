@@ -10,17 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       configs: ${{ steps.find.outputs.configs }}
-
     steps:
       - uses: actions/checkout@v4
-
       - id: find
         run: |
-          configs=$(find examples -type f \( -name '*.yaml' -o -name '*.yml' \) \
-            ! -name 'm5stack.yaml' \
-            ! -name 'esp32_external_dac.yaml' | sort | jq -R -s -c 'split("\n")[:-1]')
+          configs=$(find examples tests -type f \( -name '*.yaml' -o -name '*.yml' \) | sort | jq -R -s -c 'split("\n")[:-1]')
           echo "configs=$configs" >> "$GITHUB_OUTPUT"
-
 
   validate:
     runs-on: ubuntu-latest
