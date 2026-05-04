@@ -1,5 +1,5 @@
 name: "ESPHome Setup"
-description: "Sets up Python, installs requirements, and optionally creates CI secrets"
+description: "Sets up Python, installs dependencies, optionally creates CI secrets"
 
 inputs:
   requirements-file:
@@ -19,6 +19,7 @@ runs:
       with:
         python-version: "3.12"
         cache: "pip"
+        cache-dependency-path: ${{ inputs.requirements-file }}
 
     - name: Install dependencies
       shell: bash
@@ -28,23 +29,14 @@ runs:
 
     - name: Create dummy secrets
       if: ${{ inputs.create-secrets == 'true' }}
-      shell: python
+      shell: bash
       run: |
-        import base64, os
+        mkdir -p tests
 
-        def key():
-            return base64.b64encode(os.urandom(32)).decode()
-
-        data = {
-            'wifi_ssid': 'ci_ssid',
-            'wifi_password': 'ci_password',
-            'api_key': key(),
-            'ota_password': 'ci_ota_password',
-            'device_api_key': key(),
-        }
-
-        os.makedirs("tests", exist_ok=True)
-
-        with open("tests/secrets.yaml", "w") as f:
-            for k, v in data.items():
-                f.write(f'{k}: "{v}"\n')
+        cat > tests/secrets.yaml <<EOF
+wifi_ssid: "ci_ssid"
+wifi_password: "ci_password"
+ota_password: "ci_ota_password"
+api_key: "$(openssl rand -hex 32)"
+device_api_key: "$(openssl rand -hex 32)"
+EOF

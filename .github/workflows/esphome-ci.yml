@@ -10,16 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       configs: ${{ steps.find.outputs.configs }}
+
     steps:
       - uses: actions/checkout@v4
+
       - id: find
+        shell: bash
         run: |
-          configs=$(find tests -type f \( -name '*.yaml' -o -name '*.yml' \) | sort | jq -R -s -c 'split("\n")[:-1]')
+          configs=$(find tests -type f \( -name "*.yaml" -o -name "*.yml" \) | sort | jq -R -s -c 'split("\n")[:-1]')
           echo "configs=$configs" >> "$GITHUB_OUTPUT"
 
-  validate:
+  esphome:
     runs-on: ubuntu-latest
     needs: prepare
+
     strategy:
       fail-fast: false
       matrix:
@@ -33,25 +37,10 @@ jobs:
         with:
           create-secrets: "true"
 
-      - name: Validate config
-        run: esphome config "${{ matrix.config }}"
+      - name: Validate + Compile
+        shell: bash
+        run: |
+          echo "Config: ${{ matrix.config }}"
 
-
-  compile:
-    runs-on: ubuntu-latest
-    needs: prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        config: ${{ fromJson(needs.prepare.outputs.configs) }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: ESPHome setup
-        uses: ./.github/actions/esphome-setup
-        with:
-          create-secrets: "true"
-
-      - name: Compile config
-        run: esphome compile "${{ matrix.config }}"
+          esphome config "${{ matrix.config }}"
+          esphome compile "${{ matrix.config }}"
