@@ -43,8 +43,8 @@ runs:
             'device_api_key': key(),
         }
 
-        os.makedirs("examples", exist_ok=True)
+        os.makedirs("tests", exist_ok=True)
 
-        with open("examples/secrets.yaml", "w") as f:
+        with open("tests/secrets.yaml", "w") as f:
             for k, v in data.items():
                 f.write(f'{k}: "{v}"\n')
