@@ -3,10 +3,6 @@ substitutions:
   rx_pin: GPIO03
   update_interval: 15s
   fan_output: fan_output
-
-platformio_options:
-  build_flags:
-    - -Werror
   
 modbus:
    flow_control_pin: GPIO16
@@ -14,6 +10,9 @@ modbus:
 esphome:
   name: zehnder-comfoair-test-esp32
   friendly_name: Zehnder Comfoair Test ESP32
+  platformio_options:
+    build_flags:
+      - -Werror
 
 esp32:
   variant: esp32
