@@ -4,24 +4,41 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
-  validate:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      configs: ${{ steps.find.outputs.configs }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - id: find
+        run: |
+          configs=$(find examples -type f \( -name '*.yaml' -o -name '*.yml' \) \
+            ! -name 'm5stack.yaml' \
+            ! -name 'esp32_external_dac.yaml' | sort | jq -R -s -c 'split("\n")[:-1]')
+          echo "configs=$configs" >> "$GITHUB_OUTPUT"
+
+  validate:
+    runs-on: ubuntu-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJson(needs.prepare.outputs.configs) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
 
       - name: Install ESPHome
-        run: |
-          python -m pip install --upgrade pip esphome
+        run: pip install esphome
 
       - name: Create dummy secrets
         run: |
@@ -42,24 +59,46 @@ jobs:
                   f.write(f'{k}: "{v}"\n')
           PY
 
-      - name: Find ESPHome example configs
-        id: find-configs
-        run: |
-          configs=$(find examples -type f \( -name '*.yaml' -o -name '*.yml' \) ! -name 'm5stack.yaml' ! -name 'esp32_external_dac.yaml' | sort)
-          echo "configs<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$configs" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+      - name: Validate config
+        run: esphome config "${{ matrix.config }}"
 
-      - name: Validate example configs
-        run: |
-          while IFS= read -r cfg; do
-            echo "Validating $cfg"
-            esphome config "$cfg"
-          done <<< "${{ steps.find-configs.outputs.configs }}"
+  compile:
+    runs-on: ubuntu-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJson(needs.prepare.outputs.configs) }}
 
-      - name: Compile example configs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install ESPHome
+        run: pip install esphome
+
+      - name: Create dummy secrets
         run: |
-          while IFS= read -r cfg; do
-            echo "Compiling $cfg"
-            esphome compile "$cfg"
-          done <<< "${{ steps.find-configs.outputs.configs }}"
+          mkdir -p examples
+          python - <<'PY'
+          import base64, os
+          def key():
+              return base64.b64encode(os.urandom(32)).decode()
+          data = {
+              'wifi_ssid': 'ci_ssid',
+              'wifi_password': 'ci_password',
+              'api_key': key(),
+              'ota_password': 'ci_ota_password',
+              'device_api_key': key(),
+          }
+          with open('examples/secrets.yaml', 'w') as f:
+              for k, v in data.items():
+                  f.write(f'{k}: "{v}"\n')
+          PY
+
+      - name: Compile config
+        run: esphome compile "${{ matrix.config }}"
