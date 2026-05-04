@@ -32,16 +32,12 @@ ota:
     password: !secret ota_password
 
 packages:
-  remote_package:
-    url: https://github.com/CodedCactus/zehnder-comfoair
-    ref: 'main'
-    files: [components/zehnder.yaml,
-            components/fan.yaml,
-            components/filter.yaml,
-            components/extra-sensors.yaml,
-            components/register_dump.yaml]
-    refresh: 0s
-
+ - !include ../components/zehnder.yaml
+ - !include ../components/fan.yaml
+ - !include ../components/extra-sensors.yaml
+ - !include ../components/filter.yaml
+ - !include ../components/register_dump.yaml
+ 
 output:
 - platform: esp8266_pwm
   pin: GPIO5
