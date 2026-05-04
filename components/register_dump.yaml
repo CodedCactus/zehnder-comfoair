@@ -42,12 +42,12 @@ esphome:
            public:
             bool canHandle(esphome::web_server_idf::AsyncWebServerRequest *request) const override {
               std::array<char, 513> buf{};
-              request->url_to(std::span<char, 513>(buf));
+              auto url = request->url_to(std::span<char, 513>(buf));
               return url == "/registers" || url == "/registers/start" || url == "/registers/status" || url == "/registers/download.csv";
             }
             void handleRequest(esphome::web_server_idf::AsyncWebServerRequest *request) override {
               std::array<char, 513> buf{};
-              request->url_to(std::span<char, 513>(buf));
+              auto url = request->url_to(std::span<char, 513>(buf));
               if (url == "/registers") {
                 std::string html = "<html><head><title>Zehnder Register Dump</title>";
                 html += "<style>body{font-family:sans-serif;margin:0;line-height:1.5;background:#f4f7f9;color:#333;}";
