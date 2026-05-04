@@ -1,165 +1,195 @@
-time:
-  - platform: homeassistant
-    id: ha_time
-    on_time_sync:
-      then:
-        - component.update: zehnder_filter_age
-        - component.update: zehnder_filter_remaining
+# Register Dump via Web Server
+# Provides a CSV export of all holding registers 0-374
+
+web_server_base:
+  id: zehnder_web_server_base
+
+web_server:
+  id: zehnder_web_server
+  web_server_base_id: zehnder_web_server_base
 
 globals:
-  - id: filter_reset_timestamp
-    type: time_t
-    restore_value: yes
-    initial_value: '0'
-
-  - id: filter_replacement_interval_days
-    type: double
-    restore_value: yes
-    initial_value: '180'
-
-  - id: last_zehnder_status
+  - id: register_dump_result
     type: std::string
     restore_value: no
-    initial_value: '"Unknown"'
+    initial_value: '""'
+  - id: register_dump_batch
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: register_dump_complete
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
-sensor:
+text_sensor:
   - platform: template
-    name: "Filter age"
-    id: zehnder_filter_age
-    icon: mdi:clock-start
-    unit_of_measurement: "d"
-    state_class: measurement
-    entity_category: diagnostic
-    accuracy_decimals: 0
-    update_interval: 300s
+    name: "Register Dump"
+    id: zehnder_register_dump_output
+    internal: true
+    entity_category: "diagnostic"
+    update_interval: never
+    icon: mdi:database-export
 
-    lambda: |-
-      const auto now = id(ha_time).now();
-      const uint32_t reset_ts = id(filter_reset_timestamp);
-
-      if (!now.is_valid() || reset_ts == 0) {
-        return {};
-      }
-
-      const int32_t diff = static_cast<int32_t>(now.timestamp - reset_ts);
-      if (diff <= 0) {
-        return 0;
-      }
-
-      return diff / 86400;
-
-  # time remaining until filter replacement is needed
-  - platform: template
-    name: "Filter Remaining"
-    id: zehnder_filter_remaining
-    icon: mdi:clock-start
-    unit_of_measurement: "d"
-    state_class: measurement
-    entity_category: diagnostic
-    accuracy_decimals: 0
-    update_interval: 300s
-
-    lambda: |-
-      const auto now = id(ha_time).now();
-      const uint32_t reset_ts = id(filter_reset_timestamp);
-
-      if (!now.is_valid() || reset_ts == 0) {
-        return {};
-      }
-
-      const int32_t age = static_cast<int32_t>(now.timestamp - reset_ts);
-      const int32_t interval_sec = id(filter_replacement_interval_days) * 86400;
-
-      const int32_t remaining_sec = interval_sec - age;
-
-      if (remaining_sec > 0) {
-        return (remaining_sec + 86399) / 86400; // ceil
-      } else {
-        return 0;
-      }
-
-# replacement status
-binary_sensor:
-  - platform: template
-    name: "Filter status"
-    id: zehnder_filter_status
-    icon: mdi:air-filter
-    device_class: problem
-    entity_category: diagnostic
-
-    lambda: |-
-      const auto now = id(ha_time).now();
-      const uint32_t reset_ts = id(filter_reset_timestamp);
-
-      if (!now.is_valid() || reset_ts == 0) {
-        return false;
-      }
-
-      const int32_t age = static_cast<int32_t>(now.timestamp - reset_ts);
-      if (age <= 0) {
-        return false;
-      }
-
-      const int32_t threshold_sec = id(filter_replacement_interval_days) * 86400;
-      return age >= threshold_sec;
-
-# reset timer button
-button:
-  - platform: template
-    name: "Reset filter timer"
-    id: zehnder_reset_filter_timer
-    entity_category: config
-
-    on_press:
-      then:
-        - lambda: |-
-            auto now = id(ha_time).now();
-            if (now.is_valid()) {
-              id(filter_reset_timestamp) = now.timestamp;
-            }
-        - component.update: zehnder_filter_age
-        - component.update: zehnder_filter_remaining
-
-# configuration for the filter replacement interval (in days)
-number:
-  - platform: template
-    name: "Filter replacement interval"
-    id: zehnder_filter_replacement_interval
-    icon: mdi:calendar-clock
-    unit_of_measurement: "days"
-    min_value: 30
-    max_value: 365
-    step: 1
-    entity_category: config
-    lambda: |-
-      return id(filter_replacement_interval_days);
-    set_action:
-      then:
-        - lambda: |-
-            id(filter_replacement_interval_days) = x;
-        - component.update: zehnder_filter_remaining
-
-switch:
-  - platform: template
-    name: "Detect filter change"
-    id: zehnder_detect_filter_change
-    entity_category: config
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-
-interval:
-  - interval: 15s
+esphome:
+  on_boot:
+    priority: -100
     then:
       - lambda: |-
-          auto current = id(zehnder_status).state;
-
-          if (current != id(last_zehnder_status)) {
-
-            // Detect transition to Standby
-            if (current == "Standby") {
-              id(zehnder_reset_filter_timer).press();
+          #ifdef USE_ESP32_FRAMEWORK_ESP_IDF
+          // ESP-IDF Custom Handler
+          class DumpHandler : public esphome::web_server_idf::AsyncWebHandler {
+           public:
+            bool canHandle(esphome::web_server_idf::AsyncWebServerRequest *request) const override {
+              std::string url = request->url_to();
+              return url == "/registers" || url == "/registers/start" || url == "/registers/status" || url == "/registers/download.csv";
             }
+            void handleRequest(esphome::web_server_idf::AsyncWebServerRequest *request) override {
+              std::string url = request->url_to();
+              if (url == "/registers") {
+                std::string html = "<html><head><title>Zehnder Register Dump</title>";
+                html += "<style>body{font-family:sans-serif;margin:0;line-height:1.5;background:#f4f7f9;color:#333;}";
+                html += "nav{background:#1a1a1a;padding:15px 30px;display:flex;gap:20px;box-shadow:0 2px 10px rgba(0,0,0,0.2);}";
+                html += "nav a{color:#aaa;text-decoration:none;font-weight:500;transition:0.2s;} nav a:hover{color:#fff;}";
+                html += "nav a.active{color:#fff;border-bottom:2px solid #03a9f4;padding-bottom:4px;}";
+                html += ".content{max-width:800px;margin:40px auto;padding:40px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}";
+                html += "h1{margin-top:0;font-weight:300;color:#111;} .btn{background:#03a9f4;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s;} .btn:hover{background:#0288d1;}";
+                html += ".status-box{background:#f0f7ff;padding:20px;border-radius:10px;border-left:5px solid #03a9f4;margin:25px 0;}</style>";
+                html += "<script>function poll(){fetch('/registers/status').then(r=>r.json()).then(d=>{";
+                html += "document.getElementById('st').innerText=d.s;";
+                html += "if(d.c){document.getElementById('dl').style.display='block';}else{setTimeout(poll,1000);}";
+                html += "}).catch(e=>{setTimeout(poll,2000);});} window.onload=poll;</script></head><body>";
+                html += "<nav><a href='/'>Dashboard</a><a href='/registers' class='active'>Register Dump</a></nav>";
+                html += "<div class='content'><h1>Zehnder ComfoAir Register Dump</h1>";
+                html += "<div class='status-box'><strong>Current Status:</strong> <span id='st'>" + id(zehnder_register_dump_output).state + "</span></div>";
+                html += "<form action='/registers/start' method='POST'>";
+                html += "<input type='submit' class='btn' value='Start New Dump'>";
+                html += "</form>";
+                html += "<div id='dl' style='display:" + std::string(id(register_dump_complete) ? "block" : "none") + ";margin-top:30px;'>";
+                html += "<h3>Dump Ready</h3><p>You can now download the results as a CSV file.</p>";
+                html += "<a href='/registers/download.csv' class='btn' style='background:#4caf50;text-decoration:none;'>Download registers.csv</a>";
+                html += "</div></div></body></html>";
+                request->send(200, "text/html", html.c_str());
+              } else if (url == "/registers/start") {
+                id(register_dump_complete) = false;
+                id(register_dump_script).execute();
+                request->redirect("/registers");
+              } else if (url == "/registers/status") {
+                std::string json = "{\"s\":\"" + id(zehnder_register_dump_output).state + "\",\"c\":" + (id(register_dump_complete) ? "true" : "false") + "}";
+                auto *response = request->beginResponse(200, "application/json", json.c_str());
+                response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                request->send(response);
+              } else if (url == "/registers/download.csv") {
+                auto *response = request->beginResponse(200, "text/csv", id(register_dump_result));
+                response->addHeader("Content-Disposition", "attachment; filename=\"registers.csv\"");
+                request->send(response);
+              }
+            }
+          };
+          id(zehnder_web_server_base).get_server()->addHandler(new DumpHandler());
 
-            // Update stored state
-            id(last_zehnder_status) = current;
+          #else
+          // Arduino Logic
+          class ArduinoDumpHandler : public AsyncWebHandler {
+           public:
+            bool canHandle(AsyncWebServerRequest *request) const override {
+              if (request->method() != HTTP_GET && request->method() != HTTP_POST) return false;
+              String url = request->url_to();
+              return url == "/registers" || url == "/registers/start" || url == "/registers/status" || url == "/registers/download.csv";
+            }
+            void handleRequest(AsyncWebServerRequest *request) override {
+              String url = request->url_to();
+              if (url == "/registers") {
+                String html = "<html><head><title>Zehnder Register Dump</title>";
+                html += "<style>body{font-family:sans-serif;margin:0;line-height:1.5;background:#f4f7f9;color:#333;}";
+                html += "nav{background:#1a1a1a;padding:15px 30px;display:flex;gap:20px;box-shadow:0 2px 10px rgba(0,0,0,0.2);}";
+                html += "nav a{color:#aaa;text-decoration:none;font-weight:500;transition:0.2s;} nav a:hover{color:#fff;}";
+                html += "nav a.active{color:#fff;border-bottom:2px solid #03a9f4;padding-bottom:4px;}";
+                html += ".content{max-width:800px;margin:40px auto;padding:40px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}";
+                html += "h1{margin-top:0;font-weight:300;color:#111;} .btn{background:#03a9f4;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s;} .btn:hover{background:#0288d1;}";
+                html += ".status-box{background:#f0f7ff;padding:20px;border-radius:10px;border-left:5px solid #03a9f4;margin:25px 0;}</style>";
+                html += "<script>function poll(){fetch('/registers/status').then(r=>r.json()).then(d=>{";
+                html += "document.getElementById('st').innerText=d.s;";
+                html += "if(d.c){document.getElementById('dl').style.display='block';}else{setTimeout(poll,1000);}";
+                html += "}).catch(e=>{setTimeout(poll,2000);});} window.onload=poll;</script></head><body>";
+                html += "<nav><a href='/'>Dashboard</a><a href='/registers' class='active'>Register Dump</a></nav>";
+                html += "<div class='content'><h1>Zehnder ComfoAir Register Dump</h1>";
+                html += "<div class='status-box'><strong>Current Status:</strong> <span id='st'>" + String(id(zehnder_register_dump_output).state.c_str()) + "</span></div>";
+                html += "<form action='/registers/start' method='POST'>";
+                html += "<input type='submit' class='btn' value='Start New Dump'>";
+                html += "</form>";
+                html += "<div id='dl' style='display:" + String(id(register_dump_complete) ? "block" : "none") + ";margin-top:30px;'>";
+                html += "<h3>Dump Ready</h3><p>You can now download the results as a CSV file.</p>";
+                html += "<a href='/registers/download.csv' class='btn' style='background:#4caf50;text-decoration:none;'>Download registers.csv</a>";
+                html += "</div></div></body></html>";
+                request->send(200, "text/html", html);
+              } else if (url == "/registers/status") {
+                String json = "{\"s\":\"" + String(id(zehnder_register_dump_output).state.c_str()) + "\",\"c\":" + (id(register_dump_complete) ? "true" : "false") + "}";
+                AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
+                response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                request->send(response);
+              } else if (url == "/registers/start" && request->method() == HTTP_POST) {
+                id(register_dump_complete) = false;
+                id(register_dump_script).execute();
+                request->redirect("/registers");
+              } else if (url == "/registers/download.csv") {
+                std::string &csv = id(register_dump_result);
+                AsyncWebServerResponse *response = request->beginResponse(200, "text/csv", (uint8_t*)csv.data(), csv.size());
+                response->addHeader("Content-Disposition", "attachment; filename=\"registers.csv\"");
+                request->send(response);
+              }
+            }
+          };
+          id(zehnder_web_server_base).get_server()->addHandler(new ArduinoDumpHandler());
+          #endif
+
+script:
+  - id: register_dump_script
+    mode: single
+    then:
+      - lambda: |-
+          id(register_dump_result) = "Addr (dec),Addr (hex),Value\n";
+          id(register_dump_batch) = 0;
+          id(zehnder_register_dump_output).publish_state("Reading registers...");
+          ESP_LOGI("register_dump", "Starting register dump (0-374)...");
+
+          auto *controller = id(modbus_device);
+          const int batch_size = 50;
+          const int total_registers = 375;
+          const int num_batches = (total_registers + batch_size - 1) / batch_size;
+
+          for (int batch = 0; batch < num_batches; batch++) {
+            int start = batch * batch_size;
+            int count = std::min(batch_size, total_registers - start);
+
+            auto cmd = esphome::modbus_controller::ModbusCommandItem::create_read_command(
+              controller, esphome::modbus_controller::ModbusRegisterType::HOLDING, start, count);
+
+            cmd.on_data_func = [start, count, num_batches](
+                esphome::modbus_controller::ModbusRegisterType register_type,
+                uint16_t start_address,
+                const std::vector<uint8_t> &data) {
+
+              ESP_LOGD("register_dump", "Batch starting at %d: received %d bytes", start, data.size());
+
+              for (int i = 0; i < count && (i * 2 + 1) < (int)data.size(); i++) {
+                uint16_t value = (data[i * 2] << 8) | data[i * 2 + 1];
+                int addr = start + i;
+                char hex[8];
+                snprintf(hex, sizeof(hex), "0x%03X", addr);
+                id(register_dump_result) += std::to_string(addr) + "," + std::string(hex) + "," + std::to_string(value) + "\n";
+              }
+
+              id(register_dump_batch)++;
+              
+              if (id(register_dump_batch) >= num_batches) {
+                ESP_LOGI("register_dump", "All 8 batches complete. %zu bytes total.", id(register_dump_result).size());
+                id(zehnder_register_dump_output).publish_state("Complete (375 registers)");
+                id(register_dump_complete) = true;
+              } else {
+                id(zehnder_register_dump_output).publish_state("Reading... (" + std::to_string(id(register_dump_batch)) + "/8)");
+              }
+            };
+
+            controller->queue_command(cmd);
           }
