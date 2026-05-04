@@ -94,11 +94,12 @@ esphome:
            public:
             bool canHandle(AsyncWebServerRequest *request) const override {
               if (request->method() != HTTP_GET && request->method() != HTTP_POST) return false;
-              String url = request->url_to();
+              String url = request->url();
               return url == "/registers" || url == "/registers/start" || url == "/registers/status" || url == "/registers/download.csv";
             }
+
             void handleRequest(AsyncWebServerRequest *request) override {
-              String url = request->url_to();
+              String url = request->url();
               if (url == "/registers") {
                 String html = "<html><head><title>Zehnder Register Dump</title>";
                 html += "<style>body{font-family:sans-serif;margin:0;line-height:1.5;background:#f4f7f9;color:#333;}";
