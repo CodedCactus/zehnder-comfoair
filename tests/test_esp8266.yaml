@@ -35,7 +35,7 @@ packages:
     files: [components/zehnder.yaml,
             components/fan.yaml,
             components/filter.yaml,
-            components/extras-sensors.yaml,
+            components/extra-sensors.yaml,
             components/register_dump.yaml]
     refresh: 0s
 
