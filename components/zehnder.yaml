@@ -186,6 +186,20 @@ sensor:
   filters:
     - multiply: 0.1
 
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Running Mean Outdoor Temperature"
+  id: zehnder_rmot
+  register_type: holding
+  address: 0x142
+  unit_of_measurement: "°C"
+  device_class: "temperature"
+  value_type: S_WORD
+  accuracy_decimals: 1
+  state_class: "measurement"
+  filters:
+    - multiply: 0.1
+
 # --- humidity ---
 - platform: modbus_controller
   modbus_controller_id: modbus_device

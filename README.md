@@ -156,6 +156,7 @@ The following data fields have been identified from the holding registers. Curre
 | 0x13F   | Pre-heater status                | U_WORD   | -    | -     | 0:Off; 1:On |
 | 0x140   | Supply flow rate setpoint        | U_WORD   | m³/h | 1     | |
 | 0x141   | Exhaust flow rate setpoint       | U_WORD   | m³/h | 1     | Balance off-set is applied to this setpoint | 
+| 0x142   | Running Mean Outdoor Temperature | S_WORD   | °C   | 10    | |
 | 0x145   | Bypass motor active              | U_WORD   | -    | 1     | 0:Off; 1:One on; 2:Both on |
 | 0x146   | Bypass setpoint                  | U_WORD   | %    | 1     | 0:Closed; 100:Fully open |
 | 0x147   | Bypass position                  | U_WORD   | %    | 1     | 0:Closed; 100:Fully open |
