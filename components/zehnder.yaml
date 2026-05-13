@@ -425,7 +425,7 @@ sensor:
   register_type: holding
   value_type: U_WORD # 20800 = 2.8.0 (Major.Minor.Patch with 2 digits)
   force_new_range: true
-  skip_updates: 2147483647
+  skip_updates: 65535
   on_value: 
     then:
       - text_sensor.template.publish:
@@ -476,7 +476,7 @@ text_sensor:
     register_type: holding
     entity_category: "diagnostic"
     force_new_range: true
-    skip_updates: 2147483647
+    skip_updates: 65535
     address: 0x6F
     raw_encode: HEXBYTES
     lambda: |-
@@ -496,7 +496,7 @@ text_sensor:
     register_type: holding
     entity_category: "diagnostic"
     force_new_range: true
-    skip_updates: 2147483647
+    skip_updates: 65535
     address: 0x70
     raw_encode: HEXBYTES
     lambda: |-
@@ -541,7 +541,7 @@ binary_sensor:
   internal: true
   address: 0x152
   force_new_range: true
-  skip_updates: 2147483647
+  skip_updates: 65535
   register_type: holding
   id: zehnder_pre_heater_present_internal
   
