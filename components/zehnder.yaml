@@ -561,3 +561,196 @@ binary_sensor:
     } else {
       return {};
     }
+
+
+# --- sensor errors ---
+binary_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Temp Sensor Outdoor Air (T20)"
+    entity_category: diagnostic
+    device_class: problem
+    register_type: holding
+    address: 0x190
+    bitmask: 0x0001  # Bit 0
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Temp Sensor Pre-heater Air (T21)"
+    entity_category: diagnostic
+    device_class: problem
+    register_type: holding
+    address: 0x190
+    bitmask: 0x0002  # Bit 1
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Temp Sensor Supply Air (T22)"
+    entity_category: diagnostic
+    device_class: problem
+    register_type: holding
+    address: 0x190
+    bitmask: 0x0004  # Bit 2
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Temp Sensor Extract Air (T11)"
+    register_type: holding
+    entity_category: diagnostic
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0008  # Bit 3
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Temp Sensor Exhaust Air (T12)"
+    entity_category: diagnostic
+    device_class: problem
+    register_type: holding
+    address: 0x190
+    bitmask: 0x0010  # Bit 4
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: RH Sensor Outdoor Air (RH20)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0020  # Bit 5
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: RH Sensor Supply Air (RH22)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0040  # Bit 6
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: RH Sensor Extract Air (RH11)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0080  # Bit 7
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: RH Sensor Exhaust Air (RH12)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0100  # Bit 8
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Pressure Sensor Exhaust Air (dp12)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0200  # Bit 9
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Pressure Sensor Supply Air (dp22)"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0400  # Bit 10
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Fan Speed Exhaust Fan"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x0800  # Bit 11
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Error: Fan Speed Supply Fan"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x1000  # Bit 12
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Filter Warning"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x2000  # Bit 13
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Filter Error"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x190
+    bitmask: 0x4000  # Bit 14
+
+# --- Actuator errors ----
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Preheater too hot"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x192
+    bitmask: 0x0001  # Bit 0
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Preheater location error"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x192
+    bitmask: 0x0002  # Bit 1
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Preheater error"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x192
+    bitmask: 0x0004  # Bit 2
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Bypass motor extract air"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x192
+    bitmask: 0x0008  # Bit 3
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Bypass motor outdoor air"
+    entity_category: diagnostic
+    register_type: holding
+    device_class: problem
+    address: 0x192
+    bitmask: 0x0010  # Bit 4
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Warning frost protection active"
+    entity_category: diagnostic
+    device_class: problem
+    register_type: holding
+    address: 0x192
+    bitmask: 0x0020  # Bit 5
