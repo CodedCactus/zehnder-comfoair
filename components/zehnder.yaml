@@ -22,10 +22,8 @@ modbus_controller:
   update_interval: ${update_interval}
   on_online: # only read constant sensors once
       then:
-        - component.update: zehnder_firmware_version_raw
-        - component.update: zehnder_orientation
-        - component.update: zehnder_model
-        - component.update: zehnder_pre_heater_present_internal
+        - lambda: |-
+            id(zehnder).update();
   on_offline:
     then:
       - text_sensor.template.publish:
