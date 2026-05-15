@@ -504,6 +504,24 @@ text_sensor:
     entity_category: "diagnostic"
     address: 0x14E
     disabled_by_default: true
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Heat exchanger type"
+    id: zehnder_hx_type
+    register_type: holding
+    entity_category: "diagnostic"
+    address: 0x158
+    disabled_by_default: true
+    raw_encode: HEXBYTES
+    lambda: |-
+      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
+
+      if (value == 0) {
+        return std::string("HRV");
+      } else {
+        return std::string("ERV");
+      }
   
 binary_sensor:
 - platform: modbus_controller

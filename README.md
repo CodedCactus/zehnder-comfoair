@@ -166,6 +166,7 @@ The following data fields have been identified from the holding registers. Curre
 | 0x14B   | Bathroom switch control setpoint | U_WORD   | %    | 1     | 0:Low; 50:Medium; 100:High |
 | 0x14E   | Nr. of defrost cycles last 24 h  | U_WORD   | -    | 1     | |
 | 0x152   | Pre-heater present*              | U_WORD   | -    | -     | 0:Absent; 1:Present |
+| 0x158   | Heat exchanger type              | U_WORD   | -    | -     | 0:HRV; 1:ERV |
 | 0x151   | Fireplace mode*                  | U_WORD   | -    | -     | 0:Off; 1:On |
 
 *Only available on later firmware versions (confirmed on 2.8.0)
