@@ -157,13 +157,14 @@ The following data fields have been identified from the holding registers. Curre
 | 0x140   | Supply flow rate setpoint        | U_WORD   | m³/h | 1     | |
 | 0x141   | Exhaust flow rate setpoint       | U_WORD   | m³/h | 1     | Balance off-set is applied to this setpoint | 
 | 0x142   | Running Mean Outdoor Temperature | S_WORD   | °C   | 10    | |
-| 0x145   | Bypass motor active              | U_WORD   | -    | 1     | 0:Off; 1:One on; 2:Both on |
+| 0x145   | Bypass motor active              | U_WORD   | -    | 1     | 0:reset bypass position; 1:end position reached; 2:active |
 | 0x146   | Bypass setpoint                  | U_WORD   | %    | 1     | 0:Closed; 100:Fully open |
 | 0x147   | Bypass position                  | U_WORD   | %    | 1     | 0:Closed; 100:Fully open |
 | 0x148   | Analog (0-10 V) control setpoint | U_WORD   | %    | 1     | 0:Low; 50:Medium; 100:High |
 | 0x149   | RF control setpoint              | U_WORD   | %    | 1     | 0:Low; 50:Medium; 100:High |
 | 0x14A   | 3-way switch control setpoint    | U_WORD   | %    | 1     | 0:Low; 50:Medium; 100:High |
 | 0x14B   | Bathroom switch control setpoint | U_WORD   | %    | 1     | 0:Low; 50:Medium; 100:High |
+| 0x14E   | Nr. of defrost cycles last 24 h  | U_WORD   | -    | 1     | |
 | 0x152   | Pre-heater present*              | U_WORD   | -    | -     | 0:Absent; 1:Present |
 | 0x151   | Fireplace mode*                  | U_WORD   | -    | -     | 0:Off; 1:On |
 

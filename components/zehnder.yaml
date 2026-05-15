@@ -495,6 +495,15 @@ text_sensor:
           default: return std::string("Unknown (") + std::to_string(value) + ")";
         }
         return x;
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Nr. of defrost cycles last 24 h"
+    id: zehnder_defrost
+    register_type: holding
+    entity_category: "diagnostic"
+    address: 0x14E
+    disabled_by_default: true
   
 binary_sensor:
 - platform: modbus_controller
