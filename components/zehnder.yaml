@@ -515,7 +515,7 @@ text_sensor:
     disabled_by_default: true
     raw_encode: HEXBYTES
     lambda: |-
-      uint16_t value = modbus_controller::word_from_hex_str(x, 0);
+      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
 
       if (value == 0) {
         return {"HRV"};
