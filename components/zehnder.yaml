@@ -515,13 +515,13 @@ text_sensor:
     disabled_by_default: true
     raw_encode: HEXBYTES
     lambda: |-
-      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
-
-      if (value == 0) {
-        return std::string("HRV");
-      } else {
-        return std::string("ERV");
+      if (x == 0) {
+        return {"HRV"};
+      } else if (x == 1) {
+        return {"ERV"};
       }
+
+      return {};
   
 binary_sensor:
 - platform: modbus_controller
