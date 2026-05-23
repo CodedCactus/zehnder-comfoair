@@ -7,7 +7,7 @@ uart:
   rx_pin: ${rx_pin}
   baud_rate: 19200
   data_bits: 8
-  parity: EVEN
+  parity: NONE
   stop_bits: 1
 
 modbus:
