@@ -8,7 +8,7 @@ The component uses modbus RTU serial communication over RS485 to interface with 
 
 | Baud rate | Word length | Parity | Stop bits |
 |-----------|-------------|--------|-----------|
-| 19200     | 8           | EVEN   | 1         |
+| 19200     | 8           | NONE   | 1         |
 
 The C3 connector is located at the top right of display. To access it, remove the cover surrounding the display by removing three Torx screws. 
 The pin-out is shown in the image below:
