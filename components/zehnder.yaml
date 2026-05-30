@@ -20,11 +20,16 @@ modbus_controller:
   modbus_id: modbus1
   setup_priority: -10
   update_interval: ${update_interval}
+  on_online: # only read constant sensors once
+      then:
+        - lambda: |-
+            id(zehnder).update();
   on_offline:
     then:
       - text_sensor.template.publish:
           id: zehnder_status
           state: "Offline"
+
 
 sensor:
 # --- ventilation level ---
@@ -426,6 +431,8 @@ sensor:
   address: 0x6E
   register_type: holding
   value_type: U_WORD # 20800 = 2.8.0 (Major.Minor.Patch with 2 digits)
+  force_new_range: true
+  skip_updates: 65535
   on_value: 
     then:
       - text_sensor.template.publish:
@@ -475,6 +482,8 @@ text_sensor:
     icon: mdi:arrow-left-right-bold
     register_type: holding
     entity_category: "diagnostic"
+    force_new_range: true
+    skip_updates: 65535
     address: 0x6F
     raw_encode: HEXBYTES
     lambda: |-
@@ -493,6 +502,8 @@ text_sensor:
     icon: mdi:tag-text
     register_type: holding
     entity_category: "diagnostic"
+    force_new_range: true
+    skip_updates: 65535
     address: 0x70
     raw_encode: HEXBYTES
     lambda: |-
@@ -556,6 +567,8 @@ binary_sensor:
   modbus_controller_id: modbus_device
   internal: true
   address: 0x152
+  force_new_range: true
+  skip_updates: 65535
   register_type: holding
   id: zehnder_pre_heater_present_internal
   
