@@ -923,7 +923,7 @@ binary_sensor:
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Warning frost protection active"
+  name: "Frost protection active"
   id: zehnder_frost_protection_warning
   entity_category: diagnostic
   device_class: problem
