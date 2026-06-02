@@ -859,7 +859,7 @@ binary_sensor:
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Preheater location error"
+  name: "Preheater location"
   id: zehnder_preheater_loc_error
   entity_category: diagnostic
   register_type: holding
@@ -875,7 +875,7 @@ binary_sensor:
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Preheater error"
+  name: "Preheater"
   id: zehnder_preheater_error
   entity_category: diagnostic
   register_type: holding
@@ -923,7 +923,7 @@ binary_sensor:
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Frost protection active"
+  name: "Frost protection"
   id: zehnder_frost_protection_warning
   entity_category: diagnostic
   device_class: problem
