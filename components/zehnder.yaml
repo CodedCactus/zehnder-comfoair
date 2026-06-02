@@ -602,190 +602,337 @@ binary_sensor:
 # --- sensor errors ---
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Temp Sensor Outdoor Air (T20)"
+  id: zehnder_T20_error
+  name: "Temp Sensor Outdoor Air (T20)"
   entity_category: diagnostic
   device_class: problem
   register_type: holding
   address: 0x190
   bitmask: 0x0001  # Bit 0
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_T20_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Temp Sensor Pre-heater Air (T21)"
+  name: "Temp Sensor Pre-heater Air (T21)"
+  id: zehnder_T21_error
   entity_category: diagnostic
   device_class: problem
   register_type: holding
   address: 0x190
   bitmask: 0x0002  # Bit 1
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_T21_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Temp Sensor Supply Air (T22)"
+  name: "Temp Sensor Supply Air (T22)"
+  id: zehnder_T22_error
   entity_category: diagnostic
   device_class: problem
   register_type: holding
   address: 0x190
   bitmask: 0x0004  # Bit 2
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_T22_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Temp Sensor Extract Air (T11)"
+  name: "Temp Sensor Extract Air (T11)"
+  id: zehnder_T11_error
   register_type: holding
   entity_category: diagnostic
   device_class: problem
   address: 0x190
   bitmask: 0x0008  # Bit 3
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_T11_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Temp Sensor Exhaust Air (T12)"
+  name: "Temp Sensor Exhaust Air (T12)"
+  id: zehnder_T12_error
   entity_category: diagnostic
   device_class: problem
   register_type: holding
   address: 0x190
   bitmask: 0x0010  # Bit 4
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_T12_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: RH Sensor Outdoor Air (RH20)"
+  name: "RH Sensor Outdoor Air (RH20)"
+  id: zehnder_RH20_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0020  # Bit 5
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_RH20_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: RH Sensor Supply Air (RH22)"
+  name: "RH Sensor Supply Air (RH22)"
+  id: zehnder_RH22_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0040  # Bit 6
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_RH22_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: RH Sensor Extract Air (RH11)"
+  name: "RH Sensor Extract Air (RH11)"
+  id: zehnder_RH11_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0080  # Bit 7
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_RH11_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: RH Sensor Exhaust Air (RH12)"
+  name: "RH Sensor Exhaust Air (RH12)"
+  id: zehnder_RH12_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0100  # Bit 8
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_RH12_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Pressure Sensor Exhaust Air (dp12)"
+  name: "Pressure Sensor Exhaust Air (dp12)"
+  id: zehnder_dp12_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0200  # Bit 9
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_dp12_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Pressure Sensor Supply Air (dp22)"
+  name: "Pressure Sensor Supply Air (dp22)"
+  id: zehnder_dp22_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0400  # Bit 10
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_dp22_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Fan Speed Exhaust Fan"
+  name: "Fan Speed Exhaust Fan"
+  id: zehnder_exhaust_fan_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x0800  # Bit 11
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_exhaust_fan_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
-  name: "Error: Fan Speed Supply Fan"
+  name: "Fan Speed Supply Fan"
+  id: zehnder_supply_fan_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x1000  # Bit 12
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_supply_fan_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Filter Warning"
+  id: zehnder_filter_warning
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x2000  # Bit 13
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_filter_warning).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Filter Error"
+  id: zehnder_filter_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x190
   bitmask: 0x4000  # Bit 14
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_filter_error).state;
+    } else {
+      return {};
+    }
 
 # --- Actuator errors ----
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Preheater too hot"
+  id: zehnder_preheater_too_hot_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x192
   bitmask: 0x0001  # Bit 0
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_preheater_too_hot_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Preheater location error"
+  id: zehnder_preheater_loc_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x192
   bitmask: 0x0002  # Bit 1
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_preheater_loc_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Preheater error"
+  id: zehnder_preheater_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x192
   bitmask: 0x0004  # Bit 2
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_preheater_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Bypass motor extract air"
+  id: zehnder_extract_bypass_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x192
   bitmask: 0x0008  # Bit 3
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_extract_bypass_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Bypass motor outdoor air"
+  id: zehnder_outdoor_bypass_error
   entity_category: diagnostic
   register_type: holding
   device_class: problem
   address: 0x192
   bitmask: 0x0010  # Bit 4
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_outdoor_bypass_error).state;
+    } else {
+      return {};
+    }
 
 - platform: modbus_controller
   modbus_controller_id: modbus_device
   name: "Warning frost protection active"
+  id: zehnder_frost_protection_warning
   entity_category: diagnostic
   device_class: problem
   register_type: holding
   address: 0x192
   bitmask: 0x0020  # Bit 5
+  lambda: |-
+    if (id(zehnder_firmware_version_raw).state > 19999) { // only available on firmware 2.0.0+
+      return id(zehnder_frost_protection_warning).state;
+    } else {
+      return {};
+    }
