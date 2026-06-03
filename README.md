@@ -1,7 +1,7 @@
 [![ESPHome CI](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml/badge.svg)](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml)
 
 ## ESPHome Zehnder ComfoAir E300/E350/E400
-Interact with Zehnder ComfoAir E300/E350/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
+Interact with Zehnder ComfoAir E300/E350/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E350/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
 
 ### Setup 
 The component uses modbus RTU serial communication over RS485 to interface with the ventilation unit, furthermore the analog input on the C1 connector is used to control the ventilation level. The serial communication is available on the C3 connector. The C3 connector is located at the top right of display. To access it, remove the cover surrounding the display by removing three Torx screws. 
@@ -114,11 +114,10 @@ packages:
   remote_package:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: main
-    files: [components/zehnder_base.yaml,
-            components/zehnder_fw2.yaml,   # use fw1, fw2 or fw3 depending on your unit
-            components/fan.yaml,           # comment out fan.yaml if you don't want fan control
-            components/filter.yaml,        # comment out filter.yaml if you don't want filter replacement timer
-            components/extra-sensors.yaml] # comment out extra-sensors.yaml if you don't want extra entities
+    files: [components/zehnder_fw{major}.yaml, # use fw1, fw2 or fw3 depending on your unit
+            components/fan.yaml,               # comment out fan.yaml if you don't want fan control
+            components/filter.yaml,            # comment out filter.yaml if you don't want filter replacement timer
+            components/extra-sensors.yaml]     # comment out extra-sensors.yaml if you don't want extra entities
     refresh: 0s
 
 output:
