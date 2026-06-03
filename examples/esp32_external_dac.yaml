@@ -35,7 +35,8 @@ packages:
   remote_package:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: 'main'
-    files: [components/zehnder.yaml,
+    files: [components/zehnder_base.yaml,
+            components/zehnder_fw2.yaml,
             components/fan.yaml,
             components/filter.yaml]
     refresh: 0s
