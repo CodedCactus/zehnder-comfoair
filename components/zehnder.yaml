@@ -3,8 +3,9 @@ packages:
 
 esphome:
   on_boot:
-    priority: 600
+    priority: 600 
     then:
+      - delay: 10s
       - logger.log:
           level: WARN
-          format: "WARNING: Fallback configuration is used for zehnder comfoair. Please include the configuration specific to your firmware version!"
+          format: "Fallback configuration is used for zehnder comfoair. Please use the configuration specific to your firmware version!"
