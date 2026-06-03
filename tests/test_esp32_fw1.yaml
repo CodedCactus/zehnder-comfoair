@@ -34,7 +34,6 @@ ota:
     password: !secret ota_password
 
 packages:
- - !include ../components/zehnder_base.yaml
  - !include ../components/zehnder_fw1.yaml
  - !include ../components/fan.yaml
  - !include ../components/extra-sensors.yaml
