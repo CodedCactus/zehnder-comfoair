@@ -4,13 +4,7 @@
 Interact with Zehnder ComfoAir E300/E350/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
 
 ### Setup 
-The component uses modbus RTU serial communication over RS485 to interface with the ventilation unit, furthermore the analog input on the C1 connector is used to control the ventilation level. The serial communication is available on the C3 connector. The serial configuration is shown in the following table:
-
-| Baud rate | Word length | Parity | Stop bits |
-|-----------|-------------|--------|-----------|
-| 19200     | 8           | NONE   | 1         |
-
-The C3 connector is located at the top right of display. To access it, remove the cover surrounding the display by removing three Torx screws. 
+The component uses modbus RTU serial communication over RS485 to interface with the ventilation unit, furthermore the analog input on the C1 connector is used to control the ventilation level. The serial communication is available on the C3 connector. The C3 connector is located at the top right of display. To access it, remove the cover surrounding the display by removing three Torx screws. 
 The pin-out is shown in the image below:
 
 ![C3 port pin-out](docs/connector.png)
@@ -98,7 +92,7 @@ On older FW versions (1.x.x):
 
 ```Menu -> login (pwd 4210) -> toestel specificatie -> SW```
 
-Or on the newer FW models (2.x.x):
+Or on the newer FW models (2.x.x) and (3.x.x):
 
 ```Menu -> Opties -> SW```
 
@@ -121,7 +115,7 @@ packages:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: main
     files: [components/zehnder_base.yaml,
-            components/zehnder_fw2.yaml,   # use fw1 or fw2 depending on your unit
+            components/zehnder_fw2.yaml,   # use fw1, fw2 or fw3 depending on your unit
             components/fan.yaml,           # comment out fan.yaml if you don't want fan control
             components/filter.yaml,        # comment out filter.yaml if you don't want filter replacement timer
             components/extra-sensors.yaml] # comment out extra-sensors.yaml if you don't want extra entities

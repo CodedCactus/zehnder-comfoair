@@ -1,0 +1,37 @@
+uart:
+  id: uart_modbus
+  tx_pin: ${tx_pin}
+  rx_pin: ${rx_pin}
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+binary_sensor:
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  id: zehnder_humidity_control 
+  name: "Comfort Humidity control"
+  entity_category: diagnostic
+  address: 0x158
+  register_type: holding
+  
+text_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Heat exchanger type"
+    id: zehnder_hx_type
+    register_type: holding
+    entity_category: "diagnostic"
+    address: 0x158
+    disabled_by_default: true
+    raw_encode: HEXBYTES
+    lambda: |-
+      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
+      if (value == 0) {
+        return {"HRV"};
+      } else if (value == 1) {
+        return {"ERV"};
+      }
+
+      return {};
