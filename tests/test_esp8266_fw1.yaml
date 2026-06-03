@@ -3,21 +3,19 @@ substitutions:
   rx_pin: GPIO03
   update_interval: 15s
   fan_output: fan_output
-  
-modbus:
-   flow_control_pin: GPIO16
+  fan_speed_count: "100"
 
 esphome:
-  name: zehnder-comfoair-test-esp32
-  friendly_name: Zehnder Comfoair Test ESP32
+  name: zehnder-comfoair-test-esp8266
+  friendly_name: Zehnder Comfoair Test ESP8266
   platformio_options:
     build_flags:
       - -Werror
 
-esp32:
-  variant: esp32
+esp8266:
+  board: nodemcuv2
   framework:
-    type: esp-idf
+    version: recommended
 
 wifi:
   ssid: !secret wifi_ssid
@@ -27,20 +25,26 @@ wifi:
 
 api:
   encryption:
-    key: !secret api_key
+    key: !secret device_api_key
 
 ota:
   - platform: esphome
     password: !secret ota_password
 
 packages:
- - !include ../components/zehnder.yaml
+ - !include ../components/zehnder_base.yaml
+ - !include ../components/zehnder_fw1.yaml
  - !include ../components/fan.yaml
  - !include ../components/extra-sensors.yaml
  - !include ../components/filter.yaml
  - !include ../components/register_dump.yaml
-
+ 
 output:
-  - platform: esp32_dac
-    pin: GPIO25
-    id: fan_output
+- platform: esp8266_pwm
+  pin: GPIO5
+  frequency: 1kHz
+  id: fan_output
+
+logger:
+  baud_rate: 0
+  level: INFO

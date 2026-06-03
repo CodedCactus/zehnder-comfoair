@@ -1,7 +1,7 @@
 [![ESPHome CI](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml/badge.svg)](https://github.com/CodedCactus/zehnder-comfoair/actions/workflows/esphome-ci.yml)
 
-## ESPHome Zehnder ComfoAir E300/E400
-Interact with Zehnder ComfoAir E300/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
+## ESPHome Zehnder ComfoAir E300/E350/E400
+Interact with Zehnder ComfoAir E300/E350/E400 using ESPHome and Home Assistant. This ESPHome component provides interaction with Zehnder ComfoAir E300/E400 heat recovering ventilation units. Sensor states are read using modbus RTU, while the unit is controlled using the analog input. This integration is likely to work with the ComfoAir PRO 200/250/300 series as well, but this remains untested.
 
 ### Setup 
 The component uses modbus RTU serial communication over RS485 to interface with the ventilation unit, furthermore the analog input on the C1 connector is used to control the ventilation level. The serial communication is available on the C3 connector. The serial configuration is shown in the following table:
@@ -91,7 +91,18 @@ The following schematic shows how to connect the hardware.
 ### Example — minimal configuration
 Minimal ESPHome configuration required to use this component. Example files for other boards and setups are available in the [examples](examples) directory — adjust pins and secrets (Wi‑Fi, API/OTA keys) to match your hardware.
 
-Basic configuration (ESP32 example):
+#### Check your firmware version
+Each FW version has a seperate configuration, since the number of available sensors is dependent on the FW version. To check your FW version:
+
+On older FW versions (1.x.x):
+
+```Menu -> login (pwd 4210) -> toestel specificatie -> SW```
+
+Or on the newer FW models (2.x.x):
+
+```Menu -> Opties -> SW```
+
+#### Basic configuration (ESP32 example):
 
 ```yaml
 substitutions:
@@ -109,7 +120,8 @@ packages:
   remote_package:
     url: https://github.com/CodedCactus/zehnder-comfoair
     ref: main
-    files: [components/zehnder.yaml,
+    files: [components/zehnder_base.yaml,
+            components/zehnder_fw2.yaml,   # use fw1 or fw2 depending on your unit
             components/fan.yaml,           # comment out fan.yaml if you don't want fan control
             components/filter.yaml,        # comment out filter.yaml if you don't want filter replacement timer
             components/extra-sensors.yaml] # comment out extra-sensors.yaml if you don't want extra entities
