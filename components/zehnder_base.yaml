@@ -504,26 +504,6 @@ text_sensor:
           default: return std::string("Unknown (") + std::to_string(value) + ")";
         }
         return x;
-
-  - platform: modbus_controller
-    modbus_controller_id: modbus_device
-    name: "Heat exchanger type"
-    id: zehnder_hx_type
-    register_type: holding
-    entity_category: "diagnostic"
-    address: 0x158
-    disabled_by_default: true
-    raw_encode: HEXBYTES
-    lambda: |-
-      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
-
-      if (value == 0) {
-        return {"HRV"};
-      } else if (value == 1) {
-        return {"ERV"};
-      }
-
-      return {};
   
 binary_sensor:
 - platform: modbus_controller
@@ -551,12 +531,3 @@ binary_sensor:
   address: 0x13F
   register_type: holding
   device_class: heat
-
-- platform: modbus_controller
-  modbus_controller_id: modbus_device
-  id: zehnder_humidity_control 
-  name: "Comfort Humidity control"
-  entity_category: diagnostic
-  address: 0x158
-  register_type: holding
-  
