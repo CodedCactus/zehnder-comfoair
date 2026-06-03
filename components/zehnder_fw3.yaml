@@ -15,6 +15,238 @@ binary_sensor:
   entity_category: diagnostic
   address: 0x158
   register_type: holding
+
+# --- pre-heater ---
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Pre-heater present"
+  id: zehnder_pre_heater_present
+  icon: mdi:heating-coil
+  entity_category: "diagnostic"
+  address: 0x152
+  register_type: holding
+
+# --- fireplace ---
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: Fireplace mode
+  icon: mdi:fireplace
+  address: 0x151
+  register_type: holding
+  entity_category: "diagnostic"
+  id: zehnder_fireplace_mode
+
+# --- sensor errors ---
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  id: zehnder_T20_error
+  name: "Temp Sensor Outdoor Air (T20)"
+  entity_category: diagnostic
+  device_class: problem
+  register_type: holding
+  address: 0x190
+  bitmask: 0x0001  # Bit 0
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Temp Sensor Pre-heater Air (T21)"
+  id: zehnder_T21_error
+  entity_category: diagnostic
+  device_class: problem
+  register_type: holding
+  address: 0x190
+  bitmask: 0x0002  # Bit 1
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Temp Sensor Supply Air (T22)"
+  id: zehnder_T22_error
+  entity_category: diagnostic
+  device_class: problem
+  register_type: holding
+  address: 0x190
+  bitmask: 0x0004  # Bit 2
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Temp Sensor Extract Air (T11)"
+  id: zehnder_T11_error
+  register_type: holding
+  entity_category: diagnostic
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0008  # Bit 3
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Temp Sensor Exhaust Air (T12)"
+  id: zehnder_T12_error
+  entity_category: diagnostic
+  device_class: problem
+  register_type: holding
+  address: 0x190
+  bitmask: 0x0010  # Bit 4
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RH Sensor Outdoor Air (RH20)"
+  id: zehnder_RH20_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0020  # Bit 5
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RH Sensor Supply Air (RH22)"
+  id: zehnder_RH22_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0040  # Bit 6
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RH Sensor Extract Air (RH11)"
+  id: zehnder_RH11_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0080  # Bit 7
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "RH Sensor Exhaust Air (RH12)"
+  id: zehnder_RH12_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0100  # Bit 8
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Pressure Sensor Exhaust Air (dp12)"
+  id: zehnder_dp12_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0200  # Bit 9
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Pressure Sensor Supply Air (dp22)"
+  id: zehnder_dp22_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0400  # Bit 10
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Fan Speed Exhaust Fan"
+  id: zehnder_exhaust_fan_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x0800  # Bit 11
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Fan Speed Supply Fan"
+  id: zehnder_supply_fan_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x1000  # Bit 12
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Filter Warning"
+  id: zehnder_filter_warning
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x2000  # Bit 13
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Filter Error"
+  id: zehnder_filter_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x190
+  bitmask: 0x4000  # Bit 14
+
+# --- Actuator errors ----
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Preheater too hot"
+  id: zehnder_preheater_too_hot_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x192
+  bitmask: 0x0001  # Bit 0
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Preheater location"
+  id: zehnder_preheater_loc_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x192
+  bitmask: 0x0002  # Bit 1
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Preheater"
+  id: zehnder_preheater_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x192
+  bitmask: 0x0004  # Bit 2
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Bypass motor extract air"
+  id: zehnder_extract_bypass_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x192
+  bitmask: 0x0008  # Bit 3
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Bypass motor outdoor air"
+  id: zehnder_outdoor_bypass_error
+  entity_category: diagnostic
+  register_type: holding
+  device_class: problem
+  address: 0x192
+  bitmask: 0x0010  # Bit 4
+
+- platform: modbus_controller
+  modbus_controller_id: modbus_device
+  name: "Frost protection"
+  id: zehnder_frost_protection_warning
+  entity_category: diagnostic
+  device_class: problem
+  register_type: holding
+  address: 0x192
+  bitmask: 0x0020  # Bit 5
   
 text_sensor:
   - platform: modbus_controller
