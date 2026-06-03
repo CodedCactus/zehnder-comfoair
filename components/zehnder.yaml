@@ -1,1 +1,10 @@
-zehnder_yaml_is_depreciated_please_update_your_config: true
+packages:
+  base: !include common/zehnder_base.yaml
+
+esphome:
+  on_boot:
+    priority: 600
+    then:
+      - logger.log:
+          level: WARN
+          format: "WARNING: Fallback configuration is used for zehnder comfoair. Please include the configuration specific to your firmware version!"
