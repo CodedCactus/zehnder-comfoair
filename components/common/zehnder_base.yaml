@@ -442,13 +442,14 @@ text_sensor:
     name: "Bypass status"
     id: zehnder_bypass_status
     register_type: holding
+    entity_category: "diagnostic"
     address: 0x145
     disabled_by_default: true
     raw_encode: HEXBYTES
     lambda: |-
         uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
         switch (value) {
-          case 0: return std::string("Rest bypass position");
+          case 0: return std::string("Reset bypass position");
           case 1: return std::string("End position reached");
           case 2: return std::string("Motor active");
           default: return std::string("Unknown (") + std::to_string(value) + ")";
