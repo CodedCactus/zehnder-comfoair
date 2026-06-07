@@ -1,2 +1,4 @@
+# Configuration for devices with the 1.x.x firmware.
+
 packages:
   base: !include common/zehnder_base.yaml

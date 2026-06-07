@@ -10,3 +10,6 @@
 *.vsix
 
 *.kate-swp
+
+.esphome
+.venv
