@@ -17,7 +17,7 @@ text_sensor:
         uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
         switch (value) {
           case 0: return std::string("E300 P");
-          case 1: return std::string("E400 P")
+          case 1: return std::string("E400 P");
           case 2: return std::string("E300 RF");
           case 3: return std::string("E400 RF");
           default: return std::string("Unknown (") + std::to_string(value) + ")";
