@@ -1,5 +1,112 @@
 # Common base for 2.x.x and 3.x.x firmware versions
 
+text_sensor:
+ - platform: modbus_controller
+   modbus_controller_id: modbus_device
+   name: "Model"
+   id: zehnder_model
+   icon: mdi:tag-text
+   register_type: holding
+   entity_category: "diagnostic"
+   address: 0x06D
+   raw_encode: HEXBYTES
+   lambda: |-
+      uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
+      switch (value) {
+        case 1:  return std::string("Service PCB");
+        case 2:  return std::string("CA E 300 R P");
+        case 3:  return std::string("CA E 300 L P");
+        case 4:  return std::string("CA E 300 R RF");
+        case 5:  return std::string("CA E 300 L RF");
+        case 6:  return std::string("CA E 400 R P");
+        case 7:  return std::string("CA E 400 L P");
+        case 8:  return std::string("CA E 400 R RF");
+        case 9:  return std::string("CA E 400 L RF");
+        case 10: return std::string("CA E 350 R DE");
+        case 11: return std::string("CA E 350 L DE");
+        case 12: return std::string("CA E 350 V R DE");
+        case 13: return std::string("CA E 350 V L DE");
+        case 14: return std::string("CA PRO 300 R");
+        case 15: return std::string("CA PRO 300 L");
+        case 16: return std::string("CA E 300 R 0-10V");
+        case 17: return std::string("CA E 300 L 0-10V");
+        case 18: return std::string("CA E 400 R 0-10V");
+        case 19: return std::string("CA E 400 L 0-10V");
+        case 20: return std::string("CA E 350 R SI");
+        case 21: return std::string("CA E 350 L SI");
+        case 22: return std::string("CA E 350 R PRH SI");
+        case 23: return std::string("CA E 350 L PRH SI");
+        case 24: return std::string("CA E 300 Luxe R");
+        case 25: return std::string("CA E 300 Luxe L");
+        case 26: return std::string("CA E 300 Luxe R P");
+        case 27: return std::string("CA E 300 Luxe L P");
+        case 28: return std::string("CA E 300 Luxe R RF");
+        case 29: return std::string("CA E 300 Luxe L RF");
+        case 30: return std::string("CA E 400 Luxe R");
+        case 31: return std::string("CA E 400 Luxe L");
+        case 32: return std::string("CA E 400 Luxe R P");
+        case 33: return std::string("CA E 400 Luxe L P");
+        case 34: return std::string("CA E 400 Luxe R RF");
+        case 35: return std::string("CA E 400 Luxe L RF");
+        case 36: return std::string("CA E 350 R ERV DE");
+        case 37: return std::string("CA E 350 L ERV DE");
+        case 38: return std::string("CA E 350 R PRH ERV DE");
+        case 39: return std::string("CA E 350 L PRH ERV DE");
+        case 40: return std::string("CA E 350 R ERV SI");
+        case 41: return std::string("CA E 350 L ERV SI");
+        case 42: return std::string("CA E 350 R PRH ERV SI");
+        case 43: return std::string("CA E 350 L PRH ERV SI");
+        case 44: return std::string("CA E 300 R P RH NL");
+        case 45: return std::string("CA E 300 L P RH NL");
+        case 46: return std::string("CA E 300 R RH RF NL");
+        case 47: return std::string("CA E 300 L RH RF NL");
+        case 48: return std::string("CA E 400 R P RH NL");
+        case 49: return std::string("CA E 400 L P RH NL");
+        case 50: return std::string("CA E 400 R RH RF NL");
+        case 51: return std::string("CA E 400 L RH RF NL");
+        case 52: return std::string("CA E 300 R RH NL");
+        case 53: return std::string("CA E 300 L RH NL");
+        case 54: return std::string("CA E 400 R RH NL");
+        case 55: return std::string("CA E 400 L RH NL");
+        case 56: return std::string("CA E 300 R P PH RH NL");
+        case 57: return std::string("CA E 300 R P PH RH NL");
+        case 58: return std::string("CA E 300 R PH RH RF NL");
+        case 59: return std::string("CA E 300 L PH RH RF NL");
+        case 60: return std::string("CA E 400 R P PH RH NL");
+        case 61: return std::string("CA E 400 L P PH RH NL");
+        case 62: return std::string("CA E 400 R PH RH RF NL");
+        case 63: return std::string("CA E 400 L PH RH RF NL");
+        case 64: return std::string("CA E 300 R PH RH NL");
+        case 65: return std::string("CA E 300 L PH RH NL");
+        case 66: return std::string("CA E 400 R PH RH NL");
+        case 67: return std::string("CA E 400 L PH RH NL");
+        case 68: return std::string("CA PRO 300 R RH BE");
+        case 69: return std::string("CA PRO 300 L RH BE");
+        case 70: return std::string("CA PRO 300 R RH RF BE");
+        case 71: return std::string("CA PRO 300 L RH RF BE");
+        case 72: return std::string("CA PRO 250 R RH RF BE");
+        case 73: return std::string("CA PRO 250 L RH RF BE");
+        case 74: return std::string("CA PRO 200 R RH RF BE");
+        case 75: return std::string("CA PRO 200 L RH RF BE");
+        case 76: return std::string("CA E 350 R RH DE");
+        case 77: return std::string("CA E 350 L RH DE");
+        case 78: return std::string("CA E 350 R PH RH DE");
+        case 79: return std::string("CA E 350 L PH RH DE");
+        case 80: return std::string("CA E 350 R RH ERV DE");
+        case 81: return std::string("CA E 350 L RH ERV DE");
+        case 82: return std::string("CA E 350 R PH RH ERV DE");
+        case 83: return std::string("CA E 350 L PH RH ERV DE");
+        case 84: return std::string("CA E 350 R PH RH SI");
+        case 85: return std::string("CA E 350 L PH RH SI");
+        case 86: return std::string("CA E 350 R PH RH ERV SI");
+        case 87: return std::string("CA E 350 L PH RH ERV SI");
+        case 88: return std::string("CA E 350 R RH ERV SI");
+        case 89: return std::string("CA E 350 L RH ERV SI");
+        case 90: return std::string("CA E 350 R RH SI");
+        case 91: return std::string("CA E 350 L RH SI");
+        default: return std::string("Unknown (") + std::to_string(value) + ")";
+      }
+
 binary_sensor:
 # --- fireplace mode ---
 - platform: modbus_controller

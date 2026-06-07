@@ -2,3 +2,24 @@
 
 packages:
   base: !include common/zehnder_base.yaml
+
+text_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Model"
+    id: zehnder_model
+    icon: mdi:tag-text
+    register_type: holding
+    entity_category: "diagnostic"
+    address: 0x70
+    raw_encode: HEXBYTES
+    lambda: |-
+        uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
+        switch (value) {
+          case 0: return std::string("E300 P");
+          case 1: return std::string("E400 P");
+          case 2: return std::string("E300 RF");
+          case 3: return std::string("E400 RF");
+          default: return std::string("Unknown (") + std::to_string(value) + ")";
+        }
+        return x;
