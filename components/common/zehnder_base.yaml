@@ -439,11 +439,10 @@ text_sensor:
 
   - platform: modbus_controller
     modbus_controller_id: modbus_device
-    name: "Bypass motor active"
+    name: "Bypass status"
     id: zehnder_bypass_status
     register_type: holding
     address: 0x145
-    state_class: "measurement"
     disabled_by_default: true
     raw_encode: HEXBYTES
     lambda: |-
