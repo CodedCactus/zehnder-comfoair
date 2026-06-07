@@ -1,5 +1,9 @@
+# The fan component adds the posibility to interact with the fan speed. This includes
+# the possibility to change the fan speed, 10,30,60 min boost timer and a boost switch.
+# The fan speed will always display the actual fanspeed, independent of the selected speed.
+
 substitutions:
-  fan_speed_count: "3"
+  fan_speed_count: "3" # change to 100 to get a continuous 0-100 % slider.
 
 globals:
   - id: software_request

@@ -1,4 +1,4 @@
-# --- extra sensors calculated on the ESPHome device ---
+# Extra air quality data which is derived/calculated from the built-in sensors.
 sensor:
 
 # --- dew point ---
