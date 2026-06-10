@@ -12,8 +12,8 @@ text_sensor:
     response_size: 32
     raw_encode: ANSI
     lambda: |-
-      std::string serial = data;
-      serial.erase(serial.find('\0'));
+      std::string serial(data.begin(), data.end());
+      serial.erase(serial.find_last_not_of(' ') + 1);
       return serial;
 
   - platform: modbus_controller
