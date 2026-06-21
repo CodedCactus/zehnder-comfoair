@@ -14,17 +14,7 @@ text_sensor:
     icon: mdi:clipboard-text
     entity_category: "diagnostic"
     lambda: |-
-        uint16_t value = 10;
-        switch (value) {
-          case 0: return std::string("Error");
-          case 1: return std::string("Initializing");
-          case 2: return std::string("Self-Test");
-          case 3: return std::string("Waiting for user input");
-          case 10: return std::string("Normal");
-          case 11: case 20: return std::string("Standby");
-          case 40: case 41: case 42: return std::string("Maintenance Mode");
-        }
-        return x;
+        return std::string("Normal");
 
   - platform: modbus_controller
     modbus_controller_id: modbus_device
