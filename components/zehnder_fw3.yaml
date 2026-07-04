@@ -7,6 +7,21 @@ packages:
 uart:
   baud_rate: 9600
 
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    id: zehnder_int_sensor_error
+    internal: true
+    register_type: holding
+    address: 0x190
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    id: zehnder_int_actuator_error
+    internal: true
+    register_type: holding
+    address: 0x192
+
 text_sensor:
   - platform: template
     name: "Status"
@@ -14,7 +29,11 @@ text_sensor:
     icon: mdi:clipboard-text
     entity_category: "diagnostic"
     lambda: |-
-        return std::string("Normal");
+        if (id(zehnder_int_sensor_error) > 0) || (id(zehnder_int_actuator_error) > 0) {
+          return std::string("Error");
+        } else {
+          return std::string("Normal");
+        };
 
   - platform: modbus_controller
     modbus_controller_id: modbus_device
