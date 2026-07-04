@@ -29,7 +29,7 @@ text_sensor:
     icon: mdi:clipboard-text
     entity_category: "diagnostic"
     lambda: |-
-        if (id(zehnder_int_sensor_error) > 0) || (id(zehnder_int_actuator_error) > 0) {
+        if (id(zehnder_int_sensor_error) > 0 || id(zehnder_int_actuator_error) > 0) {
           return std::string("Error");
         } else {
           return std::string("Normal");
