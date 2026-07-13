@@ -2,6 +2,7 @@
 
 packages:
   base: !include common/zehnder_base.yaml
+  common: !include common/zehnder_common_12.yaml
 
 text_sensor:
   - platform: modbus_controller

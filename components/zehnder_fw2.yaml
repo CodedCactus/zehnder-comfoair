@@ -2,7 +2,8 @@
 
 packages:
   base: !include common/zehnder_base.yaml
-  common: !include common/zehnder_common_23.yaml
+  common: !include common/zehnder_common_12.yaml
+  common2: !include common/zehnder_common_23.yaml
 
 
 

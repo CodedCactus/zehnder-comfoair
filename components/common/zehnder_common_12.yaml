@@ -1,0 +1,24 @@
+# Common base for 1.x.x and 2.x.x firmware versions
+text_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "Status"
+    id: zehnder_status
+    icon: mdi:clipboard-text
+    entity_category: "diagnostic"
+    address: 0x65
+    register_type: holding
+    raw_encode: HEXBYTES
+    lambda: |-
+        uint16_t value = modbus::helpers::word_from_hex_str(x, 0);
+        switch (value) {
+          case 0: return std::string("Error");
+          case 1: return std::string("Initializing");
+          case 2: return std::string("Self-Test");
+          case 3: return std::string("Waiting for user input");
+          case 10: return std::string("Normal");
+          case 11: case 20: return std::string("Standby");
+          case 40: case 41: case 42: return std::string("Service Mode");
+          default: return std::string("Unknown (") + std::to_string(value) + ")";
+        }
+        return x;

@@ -7,7 +7,39 @@ packages:
 uart:
   baud_rate: 9600
 
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    id: zehnder_int_sensor_error
+    internal: true
+    register_type: holding
+    address: 0x190
+
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    id: zehnder_int_actuator_error
+    internal: true
+    register_type: holding
+    address: 0x192
+
 text_sensor:
+  - platform: template
+    name: "Status"
+    id: zehnder_status
+    icon: mdi:clipboard-text
+    entity_category: "diagnostic"
+    lambda: |-
+      if (id(zehnder_int_sensor_error).state > 0.0 ||
+          id(zehnder_int_actuator_error).state > 0.0) {
+        return std::string("Error");
+      } else if ((id(zehnder_bypass_position).state == 50) && (id(zehnder_exhaust_rpm).state == 0)) {
+        return std::string("Service Mode");
+      } else if (id(zehnder_exhaust_rpm) == 0){
+        return std::string("Standby");
+      } else {
+        return std::string("Normal");
+      }
+
   - platform: modbus_controller
     modbus_controller_id: modbus_device
     name: "Heat exchanger type"
