@@ -4,8 +4,8 @@ packages:
   base: !include common/zehnder_base.yaml
   common: !include common/zehnder_common_23.yaml
 
-# uart:
-#   baud_rate: 9600
+uart:
+  baud_rate: 9600
 
 sensor:
   - platform: modbus_controller
