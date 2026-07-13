@@ -4,8 +4,8 @@ packages:
   base: !include common/zehnder_base.yaml
   common: !include common/zehnder_common_23.yaml
 
-uart:
-  baud_rate: 9600
+# uart:
+#   baud_rate: 9600
 
 sensor:
   - platform: modbus_controller
@@ -32,6 +32,10 @@ text_sensor:
       if (id(zehnder_int_sensor_error).state > 0.0 ||
           id(zehnder_int_actuator_error).state > 0.0) {
         return std::string("Error");
+      } else if ((id(zehnder_bypass_position).state == 50) && (id(zehnder_exhaust_rpm).state == 0)) {
+        return std::string("Service Mode");
+      } else if (id(zehnder_exhaust_rpm) == 0){
+        return std::string("Standby");
       } else {
         return std::string("Normal");
       }
