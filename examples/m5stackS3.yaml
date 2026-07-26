@@ -40,6 +40,5 @@ packages:
     ref: 'main'
     files: [components/zehnder_fw2.yaml,
             components/filter.yaml,
-            components/extra-sensors.yaml,
-            components/register_dump.yaml]  # register dump
+            components/extra-sensors.yaml]
     refresh: 0s
