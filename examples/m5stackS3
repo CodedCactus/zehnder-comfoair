@@ -1,0 +1,45 @@
+# Configuration for the M5Stack ATOM S3 lite with rs485base 
+# Fan control not possible with M5stack ATOM S3 lite
+
+substitutions:
+  tx_pin: GPIO6
+  rx_pin: GPIO5
+  update_interval: 15s
+  
+esphome:
+  name: wtw-comfoair-e400
+  friendly_name: WTW Comfoair E400
+  name_add_mac_suffix: false
+  project:
+    name: m5stack.atom-rs485-zehnder
+    version: "1.0"
+esp32:
+  variant: ESP32S3
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+  cpu_frequency: 240MHZ
+  
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: WTW Comfoair E4 Fallback Hotspot
+    password: "<redacted>"
+
+packages:
+  remote_package:
+    url: https://github.com/CodedCactus/zehnder-comfoair
+    ref: 'main'
+    files: [components/zehnder_fw2.yaml,
+            components/filter.yaml,
+            components/extra-sensors.yaml,
+            components/register_dump.yaml]  # register dump
+    refresh: 0s
