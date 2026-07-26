@@ -24,6 +24,7 @@ For full project details and wiring, see the project root README: [README.md](..
 - [m5stackS3.yaml](m5stackS3.yaml) — M5Stack RS485 base + ATOM S3 Lite kit (read-only). Parts:
   - [M5Stack Atom S3 Lite](https://www.tinytronics.nl/nl/development-boards/microcontroller-boards/met-wi-fi/m5stack-atom-s3-lite-esp32-s3-development-board)
   - [M5Stack RS485 Base](https://www.tinytronics.nl/en/communication-and-signals/serial/rs-485/m5stack-atomic-rs485-base)
+
 Notes:
 - These examples work without modifications to the code and without soldering.
 - Read only by default. Optionally, pin G26 can be used to control the fan speed.
