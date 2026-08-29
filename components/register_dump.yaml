@@ -166,33 +166,38 @@ script:
             int count = std::min(batch_size, total_registers - start);
 
             auto cmd = esphome::modbus_controller::ModbusCommandItem::create_read_command(
-              controller, esphome::modbus_controller::ModbusRegisterType::HOLDING, start, count);
+              controller,
+              esphome::modbus::EntityType::HOLDING,
+              start,
+              count,
+              [start, count, num_batches](
+                  esphome::modbus::EntityType register_type,
+                  uint16_t start_address,
+                  std::span<const uint8_t> data) {
 
-            cmd.on_data_func = [start, count, num_batches](
-                esphome::modbus_controller::ModbusRegisterType register_type,
-                uint16_t start_address,
-                const std::vector<uint8_t> &data) {
+                ESP_LOGD("register_dump", "Batch starting at %d: received %d bytes", start, data.size());
 
-              ESP_LOGD("register_dump", "Batch starting at %d: received %d bytes", start, data.size());
+                for (int i = 0; i < count && (i * 2 + 1) < (int)data.size(); i++) {
+                  uint16_t value = (data[i * 2] << 8) | data[i * 2 + 1];
+                  int addr = start + i;
+                  char hex[8];
+                  snprintf(hex, sizeof(hex), "0x%03X", addr);
+                  id(register_dump_result) += std::to_string(addr) + "," + std::string(hex) + "," + std::to_string(value) + "\n";
+                }
 
-              for (int i = 0; i < count && (i * 2 + 1) < (int)data.size(); i++) {
-                uint16_t value = (data[i * 2] << 8) | data[i * 2 + 1];
-                int addr = start + i;
-                char hex[8];
-                snprintf(hex, sizeof(hex), "0x%03X", addr);
-                id(register_dump_result) += std::to_string(addr) + "," + std::string(hex) + "," + std::to_string(value) + "\n";
-              }
+                id(register_dump_batch)++;
 
-              id(register_dump_batch)++;
-              
-              if (id(register_dump_batch) >= num_batches) {
-                ESP_LOGI("register_dump", "All 8 batches complete. %zu bytes total.", id(register_dump_result).size());
-                id(zehnder_register_dump_output).publish_state("Complete (375 registers)");
-                id(register_dump_complete) = true;
-              } else {
-                id(zehnder_register_dump_output).publish_state("Reading... (" + std::to_string(id(register_dump_batch)) + "/8)");
-              }
-            };
+                if (id(register_dump_batch) >= num_batches) {
+                  ESP_LOGI("register_dump", "All %d batches complete. %zu bytes total.",
+                           num_batches, id(register_dump_result).size());
+                  id(zehnder_register_dump_output).publish_state("Complete (375 registers)");
+                  id(register_dump_complete) = true;
+                } else {
+                  id(zehnder_register_dump_output).publish_state(
+                      "Reading... (" + std::to_string(id(register_dump_batch)) + "/" +
+                      std::to_string(num_batches) + ")");
+                }
+              });
 
             controller->queue_command(cmd);
           }
