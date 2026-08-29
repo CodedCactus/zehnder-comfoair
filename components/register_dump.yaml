@@ -166,12 +166,12 @@ script:
             int count = std::min(batch_size, total_registers - start);
 
             auto cmd = esphome::modbus_controller::ModbusCommandItem::create_read_command(
-              controller, esphome::modbus_controller::ModbusRegisterType::HOLDING, start, count);
+              controller, esphome::modbus::EntityType::HOLDING, start, count);
 
             cmd.on_data_func = [start, count, num_batches](
-                esphome::modbus_controller::ModbusRegisterType register_type,
+                esphome::modbus::EntityType register_type,
                 uint16_t start_address,
-                const std::vector<uint8_t> &data) {
+                std::span<const uint8_t> data) {
 
               ESP_LOGD("register_dump", "Batch starting at %d: received %d bytes", start, data.size());
 
