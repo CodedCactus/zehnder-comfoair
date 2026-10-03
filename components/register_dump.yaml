@@ -1,12 +1,5 @@
 # Register Dump via Web Server
 # Provides a CSV export of all holding registers 0-404 (405 registers total)
-#
-# NOTE (ESPHome 2026.9.0+): ModbusCommandItem / ModbusController::queue_command()
-# are deprecated (removed in 2027.3.0). This file now uses the modbus_client
-# component's typed `modbus_client.read_holding_registers` action instead.
-# That action needs the Modbus slave address directly (not via id(modbus_device)),
-# so set register_dump_modbus_address below to match your modbus_controller's
-# `address:` setting.
 
 substitutions:
   register_dump_modbus_address: "1"  # Must match your modbus_controller's address
