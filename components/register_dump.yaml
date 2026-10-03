@@ -1,5 +1,15 @@
 # Register Dump via Web Server
-# Provides a CSV export of all holding registers 0-374
+# Provides a CSV export of all holding registers 0-404 (405 registers total)
+#
+# NOTE (ESPHome 2026.9.0+): ModbusCommandItem / ModbusController::queue_command()
+# are deprecated (removed in 2027.3.0). This file now uses the modbus_client
+# component's typed `modbus_client.read_holding_registers` action instead.
+# That action needs the Modbus slave address directly (not via id(modbus_device)),
+# so set register_dump_modbus_address below to match your modbus_controller's
+# `address:` setting.
+
+substitutions:
+  register_dump_modbus_address: "1"  # Must match your modbus_controller's address
 
 web_server_base:
   id: zehnder_web_server_base
@@ -21,6 +31,14 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  - id: register_dump_batch_start
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: register_dump_batch_count
+    type: int
+    restore_value: no
+    initial_value: '0'
 
 text_sensor:
   - platform: template
@@ -147,6 +165,7 @@ esphome:
           #endif
 
 script:
+  # Kicks off the dump: resets state, then starts the first batch.
   - id: register_dump_script
     mode: single
     then:
@@ -154,50 +173,56 @@ script:
           id(register_dump_result) = "Addr (dec),Addr (hex),Value\n";
           id(register_dump_batch) = 0;
           id(zehnder_register_dump_output).publish_state("Reading registers...");
-          ESP_LOGI("register_dump", "Starting register dump (0-374)...");
+          ESP_LOGI("register_dump", "Starting register dump (0-404)...");
+      - script.execute: register_dump_read_batch
 
-          auto *controller = id(modbus_device);
+  # Reads one batch of up to 50 holding registers, then re-invokes itself for the
+  # next batch once the response is handled. Only a single instance of this action
+  # is ever in flight, so it's safe to stash the batch's start/count in globals for
+  # the on_response/on_no_response handlers to read - those handlers run in the
+  # action's own context and can't see this script's local variables directly.
+  - id: register_dump_read_batch
+    mode: single
+    then:
+      - lambda: |-
           const int batch_size = 50;
           const int total_registers = 405;
-          const int num_batches = (total_registers + batch_size - 1) / batch_size;
-
-          for (int batch = 0; batch < num_batches; batch++) {
-            int start = batch * batch_size;
-            int count = std::min(batch_size, total_registers - start);
-
-            auto cmd = esphome::modbus_controller::ModbusCommandItem::create_read_command(
-              controller,
-              esphome::modbus::EntityType::HOLDING,
-              start,
-              count,
-              [start, count, num_batches](
-                  esphome::modbus::EntityType register_type,
-                  uint16_t start_address,
-                  std::span<const uint8_t> data) {
-
-                ESP_LOGD("register_dump", "Batch starting at %d: received %d bytes", start, data.size());
-
-                for (int i = 0; i < count && (i * 2 + 1) < (int)data.size(); i++) {
-                  uint16_t value = (data[i * 2] << 8) | data[i * 2 + 1];
-                  int addr = start + i;
-                  char hex[8];
-                  snprintf(hex, sizeof(hex), "0x%03X", addr);
-                  id(register_dump_result) += std::to_string(addr) + "," + std::string(hex) + "," + std::to_string(value) + "\n";
-                }
-
-                id(register_dump_batch)++;
-
-                if (id(register_dump_batch) >= num_batches) {
-                  ESP_LOGI("register_dump", "All %d batches complete. %zu bytes total.",
-                           num_batches, id(register_dump_result).size());
-                  id(zehnder_register_dump_output).publish_state("Complete (375 registers)");
-                  id(register_dump_complete) = true;
-                } else {
-                  id(zehnder_register_dump_output).publish_state(
-                      "Reading... (" + std::to_string(id(register_dump_batch)) + "/" +
-                      std::to_string(num_batches) + ")");
-                }
-              });
-
-            controller->queue_command(cmd);
-          }
+          int start = id(register_dump_batch) * batch_size;
+          int count = std::min(batch_size, total_registers - start);
+          id(register_dump_batch_start) = start;
+          id(register_dump_batch_count) = count;
+      - modbus_client.read_holding_registers:
+          address: ${register_dump_modbus_address}
+          start_address: !lambda 'return id(register_dump_batch_start);'
+          count: !lambda 'return id(register_dump_batch_count);'
+          on_response:
+            then:
+              - lambda: |-
+                  int start = id(register_dump_batch_start);
+                  for (size_t i = 0; i < values.size(); i++) {
+                    int addr = start + (int) i;
+                    char hex[8];
+                    snprintf(hex, sizeof(hex), "0x%03X", addr);
+                    id(register_dump_result) += std::to_string(addr) + "," + std::string(hex) + "," + std::to_string(values[i]) + "\n";
+                  }
+                  id(register_dump_batch)++;
+              - if:
+                  condition:
+                    lambda: 'return id(register_dump_batch) * 50 < 405;'
+                  then:
+                    - lambda: |-
+                        id(zehnder_register_dump_output).publish_state(
+                            "Reading... (" + std::to_string(id(register_dump_batch)) + "/9)");
+                    - script.execute: register_dump_read_batch
+                  else:
+                    - lambda: |-
+                        ESP_LOGI("register_dump", "All 9 batches complete. %zu bytes total.",
+                                 id(register_dump_result).size());
+                        id(zehnder_register_dump_output).publish_state("Complete (405 registers)");
+                        id(register_dump_complete) = true;
+          on_no_response:
+            then:
+              - lambda: |-
+                  ESP_LOGW("register_dump", "Batch starting at %d timed out - no response, stopping dump",
+                           id(register_dump_batch_start));
+                  id(zehnder_register_dump_output).publish_state("Failed: no response from device");
