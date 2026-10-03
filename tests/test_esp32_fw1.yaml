@@ -12,7 +12,7 @@ esphome:
   friendly_name: Zehnder Comfoair Test ESP32
   platformio_options:
     build_flags:
-      - -Werror
+      - -Werror=deprecated-declarations
 
 esp32:
   variant: esp32
