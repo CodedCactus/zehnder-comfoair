@@ -10,9 +10,8 @@ modbus:
 esphome:
   name: zehnder-comfoair-test-esp32
   friendly_name: Zehnder Comfoair Test ESP32
-  platformio_options:
-    build_flags:
-      - -Werror=deprecated-declarations
+  build_flags:
+    - -Werror=deprecated-declarations
 
 esp32:
   variant: esp32
@@ -31,7 +30,7 @@ api:
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    encryption:
 
 packages:
  - !include ../components/zehnder_fw3.yaml
